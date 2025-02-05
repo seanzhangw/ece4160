@@ -1,0 +1,144 @@
+2025-01-29 14:45:04,233 | MainThread   | [DEBUG   ] | <module>            |: debug
+2025-01-29 14:45:04,234 | MainThread   | [INFO    ] | <module>            |: info
+2025-01-29 14:45:04,236 | MainThread   | [WARNING ] | <module>            |: warning
+2025-01-29 14:45:04,239 | MainThread   | [ERROR   ] | <module>            |: error
+2025-01-29 14:45:04,242 | MainThread   | [CRITICAL] | <module>            |: critical
+2025-01-29 15:10:31,300 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-01-29 15:10:31,300 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-01-29 15:10:31,300 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-01-29 15:10:31,300 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-01-29 15:10:31,301 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:10:31,301 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:10:36,035 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:10:36,035 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:11:34,143 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:11:34,143 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:20:03,650 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-01-29 15:20:03,650 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-01-29 15:20:03,651 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:20:07,963 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:26:10,321 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2025-01-29 15:26:11,725 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:26:21,344 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:26:25,296 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:27:25,167 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:27:39,289 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:27:43,283 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:42:16,578 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:42:20,963 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:42:20,963 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:42:25,557 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:42:25,557 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:44:24,554 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2025-01-29 15:44:24,559 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2025-01-29 15:44:24,563 | MainThread   | [WARNING ] | exit_handler        |: Not connected to a BLE device
+2025-01-29 15:44:24,812 | MainThread   | [WARNING ] | __del__             |: Could not delete BaseBLEController instance before exiting
+2025-01-29 15:44:40,105 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-01-29 15:44:40,105 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-01-29 15:44:40,109 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:45:08,050 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:45:31,600 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:46:15,302 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:46:15,302 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:46:55,005 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:47:05,568 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 15:53:44,523 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-01-29 15:54:05,043 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 15:54:09,192 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 16:05:55,275 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2025-01-29 16:05:55,350 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2025-01-29 16:05:55,352 | MainThread   | [WARNING ] | exit_handler        |: Event loop stopped before Future completed.
+2025-01-29 16:05:55,477 | MainThread   | [WARNING ] | __del__             |: Could not delete BaseBLEController instance before exiting
+2025-01-29 16:06:04,582 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-01-29 16:06:04,582 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-01-29 16:06:04,583 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 16:06:08,565 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 16:11:10,844 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2025-01-29 16:11:10,937 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2025-01-29 16:11:10,939 | MainThread   | [WARNING ] | exit_handler        |: Event loop stopped before Future completed.
+2025-01-29 16:11:11,013 | MainThread   | [WARNING ] | __del__             |: Could not delete BaseBLEController instance before exiting
+2025-01-29 16:11:18,263 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-01-29 16:11:18,264 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-01-29 16:11:18,264 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-01-29 16:11:28,177 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-01-29 16:50:34,243 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-03 01:28:51,677 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-02-03 01:28:51,680 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-02-03 01:28:51,681 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:29:03,337 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:29:13,236 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:30:06,063 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:30:28,391 | MainThread   | [DEBUG   ] | <module>            |: debug
+2025-02-03 01:30:28,391 | MainThread   | [INFO    ] | <module>            |: info
+2025-02-03 01:30:28,394 | MainThread   | [WARNING ] | <module>            |: warning
+2025-02-03 01:30:28,396 | MainThread   | [ERROR   ] | <module>            |: error
+2025-02-03 01:30:28,398 | MainThread   | [CRITICAL] | <module>            |: critical
+2025-02-03 01:30:32,070 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-02-03 01:30:32,070 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-02-03 01:30:32,070 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:31:25,586 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:31:38,138 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-03 01:34:26,140 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-03 01:40:28,754 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:40:32,885 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-03 01:41:51,568 | MainThread   | [INFO    ] | exit_handler        |: Exiting...
+2025-02-03 01:41:51,666 | MainThread   | [WARNING ] | exit_handler        |: Could not disconnect before exiting
+2025-02-03 01:41:51,667 | MainThread   | [WARNING ] | exit_handler        |: Event loop stopped before Future completed.
+2025-02-03 01:42:06,424 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-02-03 01:42:06,425 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-02-03 01:42:06,425 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:42:10,924 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-03 01:47:52,896 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-03 01:47:56,419 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-03 01:48:00,330 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-03 07:02:16,386 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:04:02,961 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-02-04 01:04:02,962 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-02-04 01:04:02,962 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:04:07,843 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:05:51,181 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:06:12,164 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:06:16,317 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:09:03,357 | MainThread   | [INFO    ] | _connect            |: Already connected to a BLE device
+2025-02-04 01:09:04,362 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:09:07,456 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:09:11,445 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:12:09,308 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:12:20,370 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:12:24,498 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:17:57,941 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:18:02,141 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:18:06,091 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:21:15,730 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:21:19,254 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:21:23,102 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:22:33,846 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:22:37,269 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:22:41,223 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:35:50,362 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:37:25,894 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:37:30,093 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:38:34,941 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:38:39,011 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:38:43,053 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:39:40,940 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:39:48,180 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:39:52,188 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 01:40:54,085 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 01:40:59,712 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 01:41:03,679 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 15:07:18,664 | MainThread   | [DEBUG   ] | <module>            |: debug
+2025-02-04 15:07:18,692 | MainThread   | [INFO    ] | <module>            |: info
+2025-02-04 15:07:18,694 | MainThread   | [WARNING ] | <module>            |: warning
+2025-02-04 15:07:18,696 | MainThread   | [ERROR   ] | <module>            |: error
+2025-02-04 15:07:18,698 | MainThread   | [CRITICAL] | <module>            |: critical
+2025-02-04 15:07:23,681 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-02-04 15:07:23,681 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-02-04 15:07:23,683 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 15:07:29,109 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 16:30:56,552 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
+2025-02-04 16:31:55,966 | MainThread   | [DEBUG   ] | __init__            |: Python Info: sys.version_info(major=3, minor=13, micro=1, releaselevel='final', serial=0)
+2025-02-04 16:31:55,966 | MainThread   | [DEBUG   ] | __init__            |: System Info: Windows-11-10.0.22631-SP0
+2025-02-04 16:31:55,967 | MainThread   | [INFO    ] | _connect            |: Looking for Artemis Nano Peripheral Device: c0:81:80:25:12:64
+2025-02-04 16:32:00,492 | MainThread   | [INFO    ] | _connect            |: Connected to c0:81:80:25:12:64
+2025-02-04 16:49:56,608 | MainThread   | [INFO    ] | disconnect_handler  |: Disconnected from C0:81:80:25:12:64
