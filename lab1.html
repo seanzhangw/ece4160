@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 1</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link js-scroll-trigger" href="#lab1">LAB 1</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 1A: Setup and Examples</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">Feb 4<sup>th</sup>, 2025</span></div>
+                </div>
+                The purpose of Lab 1A is to setup and become familiar with programming the Artemis board with the
+                Arduino IDE.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">1A PRELAB</h3>
+                    <div class="subheading mb-2">Set up</div>
+                    <p>For the prelab,
+                        the Arduino IDE and the Appollo3 boards manager were installed.
+                    </p>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Blink</h3>
+                    <div class="subheading mb-2">Make the LED blink</div>
+                    <p>An LED on the Artemis board was blinked.</p>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/sQEYBvtN4SE?si=hqMHhNSa91-fq9SR"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Serial</h3>
+                    <div class="subheading mb-2">Read and Write</div>
+                    <p>The board is able to read the serial input echo the same output
+                        to the serial monitor.</p>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/HLKun3lvZmg?si=rueWkwNLLOpKnEmj"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">AnalogRead</h3>
+                    <div class="subheading mb-2">Temp Sensor</div>
+                    <p>The board continuously outputs the analog value detected by its temp sensor through the
+                        serial monitor. And we can see the temperature went up as the board was held.</p>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/JRbtAz0RZfM?si=s2Z3y7NKFMK_H-fx"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">MicrophoneOutput</h3>
+                    <div class="subheading mb-2">PDM</div>
+                    <p>In this part, the microphone on the board recorded the voice it recieved, and returned the
+                        frequency of the loudest sound source using Fourier Transform. The frequency can be seen
+                        changing
+                        as I speak. </p>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/JRbtAz0RZfM?si=s2Z3y7NKFMK_H-fx"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 1B: BLE Communication</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">Feb 4<sup>th</sup>, 2025</span></div>
+                </div>
+                The purpose of Lab 1B is to establish communication between a computer and the Artemis board
+                through the Bluetooth stack. Python commands will be sent from a Jupyter notebook to an Artemis
+                board.
+                <hr class="mb-3" />
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">1B PRELAB</h3>
+                    <div class="subheading mb-2">Setup</div>
+                    <p>
+                        The prelab focused on setting up Bluetooth Low Energy (BLE) communication between a computer
+                        and the RedBoard Artemis Nano using Python (Jupyter Notebooks) and Arduino.
+                    </p>
+
+                    <h4>1. Computer Setup</h4>
+                    <p>
+                        Installed Python 3.10+, `pip`, and set up a virtual environment (venv) named
+                        <code>FastRobots_ble</code>. Required Python packages were installed within the
+                        virtual environemnt with <br>
+                        <code>pip install &lt;package&gt;</code>, including <code>numpy</code>, <code>pyyaml</code>, and
+                        <code>bleak</code>.
+                    </p>
+
+                    <h4>2. Jupyter Server & Codebase</h4>
+                    <p>
+                        The Jupyter server was started, and the demo.ipynb notebook was reviewed for BLE command
+                        interactions. The `connections.yaml` file was updated with the Artemis MAC address (printed in
+                        part 3).
+                    </p>
+
+                    <h4>3. Artemis Board Setup</h4>
+                    <p>
+                        The ArduinoBLE library was installed in the Arduino IDE, and the ble_arduino.ino
+                        sketch was uploaded to the Artemis board. The baud rate was set to
+                        115200 bps, and the Artemis board successfully printed its MAC address.
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/mac_address.png" alt="mac_address" width="500" height="30">
+                    </div>
+                    </p>
+
+                    <h4>4. BLE Configuration</h4>
+                    <p>
+                        A unique UUID was generated with:<br>
+                        <code>from uuid import uuid4<br>
+                        uuid4()<br></code>
+
+                        The BLE service UUIDs were updated in both the Arduino sketch and the
+                        Python configuration file (connections.yaml) with this newly generated
+                        UUID to prevent interference with other devices.
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/connections.yaml.png" alt="connections.yaml" width="500" height="200">
+                    </div>
+                    </p>
+
+                    <h4>5. Testing BLE Communication</h4>
+                    <p>
+                        BLE communication was tested using demo.ipynb, following the
+                        provided demo. All configurations were validated before starting the lab tasks.
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/demo_notebook.png" alt="demo_notebook" width="600" height="200">
+                    </div>
+                    </p>
+                    <div class=" subheading mb-2">Codebase</div>
+                    <div class="flex-grow-1">
+                        <p>
+                            The codebase enables BLE communication between the computer and the
+                            Artemis board.
+                            The Artemis acts as a BLE peripheral, advertising its presence and exposing characteristics
+                            for data exchange.
+                            The computer, acting as the BLE central, connects to the Artemis and sends commands via BLE
+                            characteristics.
+                        </p>
+
+                        <h4>1. Artemis Board (Peripheral) Advertises BLE Service</h4>
+                        <p>
+                            The Arduino code (`ble_arduino.ino`) initializes a BLE service and starts advertising its
+                            availability.
+                            It defines characteristics for sending and receiving data using Universally Unique
+                            Identifiers (UUIDs).
+                        </p>
+                        <pre><code>
+                BLE.setDeviceName("Artemis BLE");
+                BLE.setLocalName("Artemis BLE");
+                BLE.setAdvertisedService(testService);
+                    </code></pre>
+
+                        <h4>2. Computer (Central) Connects to Artemis</h4>
+                        <p>
+                            The Python script (`demo.ipynb`) discovers and connects to the Artemis board using a BLE
+                            controller.
+                        </p>
+                        <pre><code>
+                ble = get_ble_controller()
+                ble.connect()
+                    </code></pre>
+
+                        <h4>3. Sending Commands from Computer to Artemis</h4>
+                        <p>
+                            The computer writes commands to the RX characteristic, and the Artemis reads the command
+                            using:
+                        </p>
+                        <pre><code>
+                if (rx_characteristic_string.written()) {
+                    handle_command();
+                }
+                    </code></pre>
+                        <p>
+                            For example, when the computer sends a PING command:
+                        </p>
+                        <pre><code>
+                ble.send_command(CMD.PING)
+                    </code></pre>
+                        <p>
+                            The Artemis processes it and responds with "PONG".
+                        </p>
+                        <pre><code>
+                tx_estring_value.clear();
+                tx_estring_value.append("PONG");
+                tx_characteristic_string.writeValue(tx_estring_value.c_str());
+                    </code></pre>
+
+                        <h4>4. Receiving Data on Computer</h4>
+                        <p>
+                            The computer reads sensor data or responses from the Artemis via BLE characteristics.
+                        </p>
+                        <pre><code>
+                s = ble.receive_string(ble.uuid['RX_STRING'])
+                print(s)
+                    </code></pre>
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">ECHO</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        A string value sent from the computer to the Artemis board with the <i>ECHO</i> command. The
+                        Artemis board receives this command and <code>handle_command()</code> updates the tx string
+                        GATT characteristic. The code snippet below shows the ECHO case statement within
+                        <code>handle_command()</code>
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/35a48c9e3fa31e1713289d48bc3dd6cc.js"></script>
+
+                    <p> Below are images of transmitting and receiving from Jupyter Notebook and the serial monitor of
+                        the Artemis board.</p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/send_echo.png" alt="send_echo" width="500" height="250">
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/send_echo_arduino.png" alt="send_echo" width="400" height="75">
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">SEND_THREE_FLOATS</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        Three floats are sent from the computer to the Artemis board with the <i>SEND_THREE_FLOATS</i>
+                        command. The Artemis board receives this command and <code>handle_command()</code> extracts the
+                        values with <code>get_next_value(..)</code> and stores the floats into memory. The code snippet
+                        below shows the SEND_THREE_FLOATS case statement within
+                        <code>handle_command()</code>
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/282e3d7f01c160f91454b86adc6e7a3e.js"></script>
+
+                    <p> Below are images of transmitting from the Jupyter Notebook and the serial monitor of
+                        the Artemis board.</p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/send_three_floats_notebook.png" alt="send_three_floats_notebook"
+                            width="500" height="75">
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/send_three_floats_serial.png" alt="send_three_floats_serial"
+                            width="500" height="100">
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">GET_TIME_MILLIS</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        The <i>GET_TIME_MILLIS</i> command is sent from the computer to the Artemis board. The Artemis
+                        board receives this command and <code>handle_command()</code> updates the TX string GATT
+                        characteristic
+                        to be the current time in milliseconds. The current time in milliseconds can be checked with
+                        <code>millis()</code>. The next time the computer reads the TX string characteristic, it sees
+                        the updated time.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/ce63caf997632452b2174a7b5bf42863.js"></script>
+
+                    <p> Below are images of transmitting and receiving from the Jupyter Notebook</p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/get_time_millis_jupyer.png" alt="send_three_floats_notebook"
+                            width="500" height="200">
+                    </div>
+
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">NOTIFICATION HANDLER</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        The <code>handle_notice(uuid, byte_array)</code> command is the callback function that is
+                        executed each time the string characteristic (TX for Artemis, RX for Jupyter) is updated. Within
+                        this function,
+                        the byte_array is decoded and the timestamp is saved to a timestamps array. <br>
+                        The callback function is linked to each udpate of the string characteristic with the
+                        <code>start_notify(..)</code> command.
+                    </p>
+
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/notification_handler_notebook.png" alt="notification_handler_notebook"
+                            width="500" height="250">
+                    </div>
+
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">REAL-TIME DATA RATE</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        We tested the data transmit rate by writing a loop that polled the current time in milliseconds,
+                        and
+                        send it via BLE to the computer. The code below shows the handler for the <i>TEST_DATA_RATE</i>
+                        command.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/10519746a179795606b5de48f44830e5.js"></script>
+
+                    <p> Below are images of the received timestamps in Jupyter Notebook.
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab1/data_rate_no_serial_print.png" alt="data_rate_no_serial_print"
+                            width="1000" height="200">
+                    </div>
+
+                    <p> For a loop that lasts 3 seconds, 88 entries were received. Each entry is 10 bytes. 3 bytes
+                        encode the "T:" prefix, and 6 bytes encodes the 6-digit integer as a string. The last byte is
+                        the null terminator character. <br>
+                        Multiplying the 88 entries by 10 bytes each, a total of 880 bytes were transmitted in 3 seconds,
+                        so the data rate is 293 bytes/second. </p>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">PRE-STORED DATA RATE</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        In the previous loop, we tested the data transmit rate by writing a loop that polled the current
+                        time in milliseconds,
+                        and
+                        send it via BLE to the computer within a single iteration. However, the data rate can be
+                        increased by only storing the timestamp into an array during each iteration, and having a
+                        seperate command to iterate through and send each entry in the array. The code below shows the
+                        handler for the <i>POPULATE_TIME_DATA</i> command which populates a <code>time_buffer</code>
+                        with timestampd data.
+                        command.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/36c95bd3ce09e372a4a6a631138db125.js"></script>
+
+                    <p> Along with <i>POPULATE_TIME_DATA</i>, we also need a command that tells the Artemis to transmit
+                        all of accumulated time data. We do this with the command <i>SEND_TIME_DATA</i>. The
+                        implementation is shown below. </p>
+
+                    <script src="https://gist.github.com/seanzhangw/9049ae6f6604dff922a2ca687f72fba3.js"></script>
+
+                    <p> Below are images of the received timestamps in Jupyter Notebook.
+                    <div style="text-align: center;">
+                        <img class="mb-2" src="assets/img/lab1/time_buffer_notebook.png" alt="time_buffer" width="1000"
+                            height="150">
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">TEMP AND TIME DATA</h3>
+                    <div class="subheading mb-2"></div>
+                    <p>
+                        We now add a <code>temp_buffer</code> to store temperature readings that can be correlated with
+                        saved timestamps. We accomplish this by modifying our <i>POPULATE_TIME_DATA</i> handler to read
+                        temperature data and populate our <code>time_buffer</code>. Below shows the updated code for our
+                        <i>POPULATE_TIME_DATA</i> handler.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/4ed75c5c5b55c2abed6dd7c124160b22.js"></script>
+                    <p> Along with modifying <i>POPULATE_TIME_DATA</i>, we also need to update <i>SEND_TIME_DATA</i> to
+                        send temperature entries as well. During each iteration for an index i,
+                        <code>time_buffer[i]</code> and <code>temp_buffer[i]</code> should be updated in one string.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/d07c0e638c7a5fe422d8b9b123266caf.js"></script>
+                    <p> Since the format of the string characteristic changed, we also need to update the
+                        <code>handle_notice(..)</code> comamnd to correctly parse this new format.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/ef10a73b08eebd94de5bae8a2b920b79.js"></script>
+
+                    <p>
+                        Below is the print-outs of the timestamps and temperatures array.
+                    </p>
+                    <div style="text-align: center;">
+                        <img class="mb-2" src="assets/img/lab1/temp_time_notebook_f.png" alt="time_buffer" width="1000"
+                            height="250">
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">REAL-TIME TRANSMIT VS POPULATE THEN TRANSMIT</h3>
+                    <b> Discuss the differences between these two methods, the advantages and disadvantages of both and
+                        the potential scenarios that you might choose one method over another. </b>
+                    <p>
+                        The first method, real-time data streaming, sends data as soon as it’s generated.
+                        This is suitable for applications that need live updates, like real-time monitoring or
+                        telemetry.
+                        The big advantage here is that the receiving device gets the most up-to-date information right
+                        away. However, the data rate is tied to how fast <code>millis()</code> can execute. This
+                        increases the time between transmissions and decreases the data throughput and data resolution.
+                    </p>
+                    <p>
+                        The second method, pre-stored data transfer, stores data in a buffer first and then sends the
+                        data seperately. This method allows for much higher data rates because the transmission is only
+                        limited by how fast you can index the array and write to the BLE characteristic. It also
+                        captures data at a muchhigher resolution since the sampling rate isn’t tied to how fast you can
+                        send it. On the downside, this method isn’t real-time. There’s a delay between when the data
+                        is generated and when it’s transmitted. It also requires more memory to store the data, which
+                        can be an issue for devices with limited resources.
+                    </p>
+
+                    <p>
+                        Some concrete scenarios where real-time transmissions may be preferable over the pre-storage
+                        transmissions include feedback control loops and live-monitoring scenarios. Pre-storage could be
+                        preferrable in data-logging scenarios where high resolution is required for analysis.
+                    </p>
+
+                    <b>How "quickly" can the second method record data?</b>
+
+                    <p>I am making the assumption this question is asking about how fast the pre-storage method can
+                        store data into memory, and not the transmission data rate. Observing the time and temperature
+                        timestamps, it took ~16 milliseconds to record 50 entries of time and tempearture data. Since
+                        each time and temperature data is 4 bytes, this means 50 * 4 * 2 = 400 total bytes were
+                        transmitted in ~16 milliseconds. Converting to seconds, ~25,000 bytes can be recorded per
+                        second.
+                    </p>
+
+                    <b>The Artemis board has 384 kB of RAM. Approximately how much data can you store to send without
+                        running out of memory?
+                    </b>
+
+                    <p>I am making the assumption that all 384 kB of RAM are available for storing data. In reality,
+                        code, stack, and other processes take up part of this memory. With 384kB of memory, we can store
+                        a total of 96,000 bytes. This could be 48,000 time data entries and 48,000 temp data entries
+                        assuming time and temp are floats.
+                    </p>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">LAB DISCUSSION</h3>
+                    <p>
+                        Through this lab, I gained a deeper understanding of the Bluetooth Low Energy (BLE) protocol,
+                        particularly how data is transmitted between the computer and the Artemis board using GATT
+                        characteristics. One challenge I encountered was a blue screen error while using the serial
+                        monitor,
+                        which I suspect was caused by a memory overflow issue at the 115200 baud rate.
+                    </p>
+                    <p>
+                        An interesting discovery was that the RESOLUTION_BITS setting applies not only to external ADC
+                        pins
+                        but also to internal ADCs, such as the temperature sensor. This means adjusting resolution
+                        impacts
+                        both internal and external readings, which was unexpected.
+                    </p>
+                    <p>
+                        I also noticed that Serial.println() is a slow operation, and when used in real-time
+                        transmissions,
+                        it significantly reduced the speed of data updates. Removing unnecessary serial output improved
+                        performance and allowed data to be sent over BLE much faster.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
