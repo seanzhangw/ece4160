@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 2</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <!-- MathJax -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link " href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 2: IMU</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">Feb 4<sup>th</sup>, 2025</span></div>
+                </div>
+                This lab section is to setup the 9DOF IMU, getting the accelerometer and gyroscope data. Furthermore,
+                the low
+                pass filter and complimentary filter can be applied to improve the calculated pitch and roll values.
+                A bluetooth interface was implemented to read, plot, calibrate the IMU through a Jupyter notebook
+                instance.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">PRELAB</h3>
+                    <div class="subheading mb-2">Background Reading</div>
+                    <p>For the prelab, the IMU's <a
+                            href="https://cdn.sparkfun.com/assets/7/f/e/c/d/DS-000189-ICM-20948-v1.3.pdf">datasheet</a>
+                        and
+                        <a href="https://github.com/sparkfun/SparkFun_ICM-20948_ArduinoLibrary">software library</a>
+                        was skimmed.
+
+                    </p>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Set up the IMU</h3>
+                    <div class="subheading mb-2">Connections</div>
+                    <p>The IMU is connected to the Artemis Nano via a QWIIC connector.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab2/artemis_imu_physical_connection.jpg" alt="mac_address" width="200"
+                            height="300">
+                    </div>
+
+                    <div class="subheading mb-2">Example code</div>
+                    <p>The following video demonstrates the Example1_Basics.ino script form the ICM 20948 Arduino
+                        Library. </p>
+                    <div style="text-align: center;">
+                        <iframe class="mb-1" width="560" height="315"
+                            src="https://www.youtube.com/embed/vdOXEcYinj0?si=Y8F9rmVF2RGItXQA"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <p>The AD0_VAL value represents the last bit of the I2C address. According to the script, the
+                        SparkFun 9DoF IMU breakout defaults to 1, and the value becomes 0 when the ADR jumper is closed.
+                        This flexibility in the I2C address allows us to have multiple devices on a single I2C bus.
+                    </p>
+                    <p>The acceleration data shows the magnitude of acceleration in milli G's. Accelerometer outputs are
+                        split into the X, Y, and Z directions. When the accelerometer is placed on a flat surface, the
+                        magnitude of the acceleration in the Z direction is ~1G, corresponding to Earth's gravity.
+                        The gyroscope data showed the current angular velocity in the X, Y, and Z axis in degrees per
+                        second.
+                    </p>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Accelerometer</h3>
+                    <div class="subheading mb-2">Initial Pitch/Roll</div>
+                    <p>The pitch and roll values are calculated from the accelerometer data. The pitch value is the
+                        angle between the X-axis and the horizontal plane, while the roll value is the angle between the
+                        Y-axis and the horizontal plane. The pitch and roll values are calculated using the following
+                        functions:
+                    </p>
+                    <p>
+                        The <code>atan2_custom(..)</code> function returns a value between -pi and pi the pitch and roll
+                        in radians. The
+                        <code>ACCEL_[PITCH/ROLL]_CONVERSION</code> and <code>ACCEL_[PITCH/ROLL]_OFFSET</code> have
+                        values of 1 and 0 respectively. These will be calibrated using two-point calibration in a later
+                        section.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/5cc2699c7b6dc0778e2409c1e050b521.js"></script>
+                    <script class="mb-1"
+                        src="https://gist.github.com/seanzhangw/3771749899051e8990ac92fd83e1f8bc.js"></script>
+
+                    <p>Bluetooth commands <code>GET_ACCEL_PITCH</code> and <code>GET_ACCEL_ROLL</code> are also
+                        implemented. The uncalibrated pitch and roll at -90, 0, and 90 degrees is shown using the
+                        bluetooth interface. </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>GET_ACCEL_PITCH command</figcaption>
+                            <img src="assets/img/lab2/uncalibrated_accel_pitch_n_90.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>GET_ACCEL_ROLL command</figcaption>
+                            <img src="assets/img/lab2/uncalibrated_accel_roll_n_90.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <table
+                            style="width:100%; text-align: center; border: 1px solid black; border-collapse: collapse;">
+                            <figcaption>Uncalibrated Pitch and Roll for -90, 0 and 90 Degrees</figcaption>
+                            <tr>
+                                <th style="border: 1px solid black; padding: 8px;">Degrees</th>
+                                <th style="border: 1px solid black; padding: 8px;">Pitch (radians)</th>
+                                <th style="border: 1px solid black; padding: 8px;">Roll (radians)</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">-90</td>
+                                <td style="border: 1px solid black; padding: 8px;">0.026</td>
+                                <td style="border: 1px solid black; padding: 8px;">3.051</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">0</td>
+                                <td style="border: 1px solid black; padding: 8px;">1.529</td>
+                                <td style="border: 1px solid black; padding: 8px;">1.576</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">90</td>
+                                <td style="border: 1px solid black; padding: 8px;">3.043</td>
+                                <td style="border: 1px solid black; padding: 8px;">0.008</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="subheading mb-2">Accelerometer accuracy</div>
+                    <p>The following graph shows the calculated pitch and roll values before calibration for an IMU
+                        flush to a flat surface. The accelerometer pitch and roll has a +/- 0.015 radians of noise.
+                        Furthermore, the pitch and roll should be 0, but is off by a factor of ~1.53 and ~1.58
+                        radians respectively. Notably, the accelerometer has little drift. Data was recorded around 66
+                        seconds after the Artemis was flashed, and the pitch and roll are still similar to what was
+                        measured at 0 degrees in the table above.
+                    </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch and Roll vs Time (Still)</figcaption>
+                            <img src="assets/img/lab2/uncalibrated_accel_pitch_roll_still.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch vs Time (Rotating)</figcaption>
+                            <img src="assets/img/lab2/uncalibrated_accel_pitch_rotating.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Roll vs Time (Rotating)</figcaption>
+                            <img src="assets/img/lab2/uncalibrated_accel_roll_rotating.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+
+                    <div class="subheading mb-2">Scaling calibration and offsets</div>
+
+                    <p>The accelerometer's scaling accuracy can be improved by calibrating the pitch and roll values.
+                        The
+                        accelerometer's pitch and roll values are calibrated using a two-point calibration method. The
+                        calibration points are set to -90 and 90 degrees. The calibration values are calculated using
+                        the
+                        following code:
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/c34f947f80bd4a0a4a7c9951b1ff3c1b.js"></script>
+                    <p>
+                        The <code>p_90_accel_[pitch/roll]</code> and <code>n_90_accel_[pitch/roll]</code> variables are
+                        the uncalibrated
+                        values of pitch and roll when the IMU is held at 90 and -90 degrees respectively. Since the
+                        desired angles range from
+                        -90 to 90, the desired range is 180. The deisred range is divided by the actual range to find
+                        the conversion factor.
+                    </p>
+                    <p>
+                        The <code>accel_[pitch/roll[_offset_raw</code> variables houses the uncalibrated pitch and roll
+                        values when the IMU is held with 0 pitch and 0 roll. The <code>accel_[pitch/roll]_offset</code>
+                        variable is calculated by multiplying the raw offset with our previously calculated conversion
+                        factor.
+                    </p>
+                    <p>
+                        A bluetooth command <code>CALIBRATE_ACCEL</code> is implemented to calibrate the pitch and roll
+                        by sending our calculated conversion factors and offsets to the Artemis board. The conversion
+                        factors will then be used when the Artemis calculates pitch and roll values, meaning subsequent
+                        <code>GET_ACCEL_[PITCH/ROLL]</code> commands will give us readings with the correct scale.
+                    </p>
+
+                    <div class="mb-2" style="text-align: center;">
+                        <table
+                            style="width:100%; text-align: center; border: 1px solid black; border-collapse: collapse;">
+                            <figcaption>Calibrated Pitch and Roll for -90, 0 and 90 Degrees</figcaption>
+                            <tr>
+                                <th style="border: 1px solid black; padding: 8px;">Degrees</th>
+                                <th style="border: 1px solid black; padding: 8px;">Pitch (radians)</th>
+                                <th style="border: 1px solid black; padding: 8px;">Roll (radians)</th>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">-90</td>
+                                <td style="border: 1px solid black; padding: 8px;">-91.474</td>
+                                <td style="border: 1px solid black; padding: 8px;">-91.749</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">0</td>
+                                <td style="border: 1px solid black; padding: 8px;">0.757</td>
+                                <td style="border: 1px solid black; padding: 8px;">-0.335</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid black; padding: 8px;">90</td>
+                                <td style="border: 1px solid black; padding: 8px;">95.746</td>
+                                <td style="border: 1px solid black; padding: 8px;">89.713</td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch and Roll vs Time (Still)</figcaption>
+                            <img src="assets/img/lab2/calibrated_accel_pitch_roll_still.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch vs Time (Rotating)</figcaption>
+                            <img src="assets/img/lab2/calibrated_accel_pitch_rotating.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Roll vs Time (Rotating)</figcaption>
+                            <img src="assets/img/lab2/calibrated_accel_roll_rotating.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="" mb-2" style="text-align: center;">
+                        <iframe class="mb-1" width="560" height="315"
+                            src="https://www.youtube.com/embed/xopKyMU1h4c?si=NFyIS0kK_OC16Pxa"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                    <div class="subheading mb-2">Low-Pass Filtering and the FFT</div>
+                    <p>Before implementing a low-pass filter, the noise needs to be characterized to find an appropriate
+                        cut-off frequency. The noise was characterized with an FFT for cases where the IMU was still and
+                        faced a disturbance. The FFT was calculated by sending labeled Pitch and Roll data with
+                        timestamps to calculate the frequency between data points. Numpy's fft library was then used to
+                        fit the time-domain data to the frequency domain.</p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Frequency Domain Signal of Pitch and Roll (Still)</figcaption>
+                            <img src="assets/img/lab2/pitch_roll_115200_still.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Frequency Domain Signal of Pitch and Roll (Disturbance)</figcaption>
+                            <img src="assets/img/lab2/pitch_roll_115200_disturbance.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <p>Based on the FFT, we see most noise occurs at frequencies greater than 5 Hz. Thus, we can set
+                        our
+                        cut-off frequency to be 5 Hz. Using the following equations, we can find our \(\alpha\) value
+                        for
+                        our low-pass filter. </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <p>
+                            \( dt = \frac{1}{\text{Sample Rate}} = \frac{1}{196 \text{ Hz}} = 0.005102 \text{ seconds}
+                            \)
+                        </p>
+
+                        <p>
+                            \( RC = \frac{1}{2 \cdot \pi \cdot f_{\text{low-pass}}} = \frac{1}{2 \cdot \pi \cdot 5
+                            \text{
+                            Hz}} = 0.032 \text{ seconds} \)
+                        </p>
+
+                        <p>
+                            \( \alpha = \frac{dt}{dt + RC} = \frac{0.005102}{0.0.005102 + 0.032} = 0.138259 \)
+                        </p>
+                    </div>
+                    <p>
+                        We can now use \( \alpha \) to calculate the low-pass filter value for the pitch and roll using
+                        the following equation from lecture 3.
+                    <p>
+                        \[
+                        \theta_{\text{LPF}}[n] = \alpha \cdot \theta_{\text{RAW}} + (1 - \alpha) \cdot
+                        \theta_{\text{LPF}}[n-1]
+                        \]
+                    </p>
+
+                    <p>
+                        \[
+                        \theta_{\text{LPF}}[n-1] = \theta_{\text{LPF}}[n]
+                        \]
+                    </p>
+                    This equation is implemented below in code on lines 16-17.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/ec27f6bb4edb45ce35e8aaccb5ac0574.js"></script>
+                    <p>The following figure illustrates the frequency domain signal of the low-pass-filtered pitch and
+                        roll. The magnitudes of disturbances are significantly less compared to the unfiltered version.
+                    </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Frequency Domain Signal of Low-Pass Filtered Pitch and Roll (Disturbance)
+                            </figcaption>
+                            <img src="assets/img/lab2/pitch_roll_disturbance_low_pass.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <p>
+                        The following figures illustrates the difference between the low-pass filtered pitch and roll
+                        and the unfiltered pitch and roll. The low-pass filtered pitch and roll are smoother and have
+                        less noise compared to the unfiltered pitch and roll.
+                    </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Low-Pass Filtered Pitch and Roll (Disturbance)
+                            </figcaption>
+                            <img src="assets/img/lab2/low_pass_accel_pitch_roll_disturbance.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>No Low-Pass Pitch and Roll (Disturbance)
+                            </figcaption>
+                            <img src="assets/img/lab2/disturbance_accel_pitch_roll_no_lowpass.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Gyroscope</h3>
+                    <div class="subheading mb-2">Pitch, Roll, and Yaw</div>
+                    <p>The gyroscope measures angular velocity in degrees per second. We integrate these measurements to
+                        calculate pitch, roll, and yaw. However, because we base new calculations off of past
+                        measurements, errors accumulate. This causes drift in our measurements. The code below runs on
+                        the Artemis board and calculates the pitch value based on gyroscope measurements.
+
+                        <script src="https://gist.github.com/seanzhangw/9c44b85bfa9e3f42c66edfd3f726c5e5.js"></script>
+
+                        This function is called in the <code>handle_command()</code> function within our bluetooth
+                        interface. This is shown below.
+                        <script src="https://gist.github.com/seanzhangw/1e3dcc2e21119de9e61c8d8ab1daeb23.js"></script>
+
+                        The <code>GET_GYRO_DATA</code> command is sent via BLE from our Jupyter instance get the
+                        gyroscope pitch, roll, and yaw
+                        values from the Artemis board for 1000 samples. A <code>extract_gyro_data(..)</code> function
+                        parses the received strings and processes them into arrays for plotting.
+
+                        <script src="https://gist.github.com/seanzhangw/ebcafc4ee7a1f98c22b6cbe7178805e0.js"></script>
+
+                        With no delay in our
+                        sampling loop, there is some drift. Within 3 seconds, the Yaw value climbed ~4 degrees.
+                    </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch, Roll, and Yaw vs Time (No Delay & Still)
+                            </figcaption>
+                            <img src="assets/img/lab2/gyro_still.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <p>
+                        With a 20ms delay in our sampling loop, the drift significantly increased. Within 12 seconds,
+                        the Yaw value climbed ~22 degrees. With a delay in our loop, inaccuracies in our gyro
+                        measurements are compounded due to the larger timestamp. This results in a larger drift.
+                    </p>
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch, Roll, and Yaw vs Time (20ms Delay & Still)
+                            </figcaption>
+                            <img src="assets/img/lab2/gyro_still_20ms_delay.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                    <div style="text-align: center;">
+                        <iframe class="mb-1" width="560" height="315" src="https://www.youtube.com/embed/w9vDGtZDM10"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+
+                    <div class="subheading mb-2">Complementary Filter</div>
+                    <p> To decrease the effect of drift from the gyroscope and noise from the accelerometer, a
+                        complementary filter is used to combine the accelerometer and gyroscope data to calculate
+                        pitch and roll. The \( \alpha \) value determines the weighting between the
+                        accelerometer and gyroscope values. The following equation is used to calculate the pitch and
+                        roll.
+                    </p>
+                    <p>
+                        \[
+                        \theta_{\text{COMP}} = \alpha \cdot \theta_{\text{GYRO}} + (1 - \alpha) \cdot
+                        \theta_{\text{ACCEL}}
+                        \]
+                    </p>
+                    <p>From observations, the accelerometer is a better estimator of our current attitude compared with
+                        the gyroscope for most samples larger than a few seconds. With this justification, a \( \alpha
+                        \) value of <b>0.8</b> is chosen.</p>
+
+                    <p>The following code is used to calculate the roll using the complementary filter. </p>
+                    <script src="https://gist.github.com/seanzhangw/c3d51441eea125d2f7db042163289062.js"></script>
+                    <p>The following code is used within the <code>handle_command()</code> function to send our filtered
+                        data to our Jupyter instance.</p>
+                    <script src="https://gist.github.com/seanzhangw/36182c603181443f2d934560aa044648.js"></script>
+                    <p>The following figure illustrates the pitch, roll, and yaw data with pitch and roll calculated
+                        using the complementary filter. The amount of noise and drift is reduced when compared to the
+                        pitch and roll of the accelerometer and gyroscope in isolation respectively.</p>
+
+                    <div class="mb-2" style="text-align: center;">
+                        <figure>
+                            <figcaption>Pitch, Roll, and Yaw vs Time (Complementary Filter & Still)
+                            </figcaption>
+                            <img src="assets/img/lab2/comp_filter_pitch_roll_yaw_still.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                        <figure>
+                            <figcaption>Pitch, Roll, and Yaw vs Time (Complementary Filter & Moving)
+                            </figcaption>
+                            <img src="assets/img/lab2/comp_filter_pitch_roll_yaw_still.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                        </figure>
+                    </div>
+                </div>
+                <div style="text-align: center;">
+                    <iframe class="mb-1" width="560" height="315" src="https://www.youtube.com/embed/UAujUl3Ftzw"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
+
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">RC STUNT</h3>
+                    <div style="text-align: center;"">
+                    <iframe class=" mb-1" width="560" height="315" src="https://www.youtube.com/embed/Auce1pcPCDs"
+                        title="YouTube video player" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
