@@ -1,0 +1,4 @@
+code/lab2/data/*
+
+*.pyc
+*.log
