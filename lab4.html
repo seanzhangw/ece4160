@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 4</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 4: Motors and Open Loop Control</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">Feb 28<sup>th</sup>, 2026</span></div>
+                </div>
+                The purpose of lab 4 is to solder and assemble electronics into the Force1 car chassis. Furthermore, the
+                Artemis board and dual motor drivers will be used to demonstrate open-loop control of the car.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">PRELAB</h3>
+                    <p>
+                        Pins <b>13</b>, <b>14</b>, <b>15</b>, <b>16</b> are used to control the two motor drivers.
+                        The wiring diagram of the motor drivers is shown below. The Artemis Nano and Apollo3 pinout
+                        schematics were consulted to find pins capable of PWM outputs. The A and B input and output
+                        channels are coupled together to drive one motor to increase the total current output. The TOF
+                        and IMU sensors are excluded.
+                    </p>
+                    <p>
+                        The Artemis is powered by a dedicated 650 mAh battery while the motor drivers are powered from a
+                        850 mAh battery. Since the current draw of the motor drivers is high, having a dedicated power
+                        supply for the Artemis ensures that the Artemis does not reset due to voltage drops. To reduce
+                        EMI interference, wire lengths are kept short.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab4/prelab_wiring_diagram.jpeg" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 1: Wiring diagram of Artemis board, batteries, and motor drivers.
+                        </figcaption>
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Testing Motor Drivers</h3>
+                        <!-- <div class="subheading mb-2">Connections</div> -->
+                        <p>Before permanently assembling electronics into the car chassis, the dual motor drivers are
+                            each tested to ensure they can provide PWM output. A DC power supply is used to power a
+                            motor driver and the output is checked with an oscillopscoe for this initial test. The OUT1
+                            and OUT2 pins are conected to the oscillopscoe probes.</p>
+                        <h4>Power supply discussion</h4>
+                        <p>The DC power supply was set to 3.7V. Although the drivers accept up to 10.8V (<a
+                                href="https://www.pololu.com/product-info-merged/2130">datasheet</a>), 3.7V is chosen to
+                            simulate the voltage of the 850 mAh battery.</p>
+
+                        <p> The setup is shown below. In the figure, the motor driver is being controlled from pins 15
+                            and 16 on the Artemis and the OUT2 pin is being scoped. </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab4/oscilloscope_setup.jpg" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 2: Testing motor drivers with oscilloscope
+                            </figcaption>
+                        </div>
+                        <p> With the setup above, the <i>analogWrite(15, 63)</i> and <i>analogWrite(16, 0)</i> commands
+                            send a PWM with 25% duty cycle to the motor driver. The code and oscilloscope output on the
+                            OUT2 pin are
+                            shown below. </p>
+                        <div style="text-align: center;">
+                            <script
+                                src="https://gist.github.com/seanzhangw/ae4a8541297c6ffe84e054c9b78bccbb.js"></script>
+                            <img src="assets/img/lab4/oscilloscope_pwm.jpg" alt="mac_address"
+                                style="max-width: 50%; height: 50;">
+                            <figcaption>Figure 3: Oscilloscope output with a 25% duty cycle PWM signal
+                            </figcaption>
+                        </div>
+                        <p> Once the oscilloscope confirms that the motor drivers are outputting the correct PWM
+                            signals, the motor driver outputs are soldered to the car wheel motors. The video below
+                            demonstrates the car's left wheels spinning with the code below. The motor drivers are still
+                            being powered from the DC power supply.</p>
+                        <script src="https://gist.github.com/seanzhangw/e685d082326a1af06e9b5e14825f9cc9.js"></script>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/4M2un_5_OKs"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/sJNh4tTonkU"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 4: Car wheels spinning counter-clockwise (first video) and clockwise
+                                (second video) with motor drivers
+                            </figcaption>
+                        </div>
+                        <p> To test both motors on the 850 mAh battery, the lines controlling the right motor are
+                            uncommented. The Vin and GND ports of the dual motor drivers are connected to the positive
+                            and negative terminals of the 850 mAh battery. The video of both motors spinning on battery
+                            power is shown below.</p>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/wBJoqY4ucd0"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>
+                                Figure 5: Both car wheels spinning with motor drivers on battery power
+                            </figcaption>
+                        </div>
+
+
+                        <div class="flex-grow-1">
+                            <h3 class="mb-1">Car Assembly</h3>
+                            <p>With the motor drivers tested, the electronics can be assembled into the car chassis. The
+                                TOF sensors are mounted at the front and back of the car. The 850 mAh battery is stored
+                                in the battery compartment. The Artemis board, 650 mAh, and IMU are in the compartment
+                                that housed the original car control board. The motor drivers are mounted on the
+                                backside of the battery compartment. Electrical tape is used to secure wires and
+                                physically secure the electronics. Zip ties may be added in the future to further secure
+                                the wires to the chassis.
+                            </p>
+
+                            <div style="text-align: center;">
+                                <img src="assets/img/lab4/car_assembly.jpg" alt="mac_address"
+                                    style="max-width: 50%; height: auto;">
+                                <figcaption>Figure 6: Full car assembly
+                                </figcaption>
+
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <h3 class="mb-1">Calibration</h3>
+                            <h4> Lower limit PWM discussion</h4>
+                            <p></p>
+                            <p> The lower limit PWM is the minimum PWM duty cycle that causes the car to move. The lower
+                                limit
+                                PWM is found by slowly incrementing the PWM value until the car moves. This value was
+                                found to be around an <i>analogWrite</i> of around 40, or a 16% PWM duty cycle. However,
+                                testing was conducted with a battery that had been previously used for testing. With a
+                                freshly charged battery, an <i>analogWrite</i> of 45, or a 17.6% PWM duty cycle was able
+                                to start the car from rest. </p>
+                            <p> An in-place turn required an <i>analogWrite</i> of 60, corresponding to a 23.5% PWM duty
+                                cycle. </p>
+                            <h4>Calibration Factor</h4>
+                            <p>
+                                Initially, the <i>analogWrite</i> values for both motors were set to the same value. The
+                                result of this test is shown below. The car veers to the right. This could be due to the
+                                car being
+                                unbalanced or the motors having different characteristics. To correct this, the left
+                                motor is set to a lower <i>analogWrite</i> value. The car now moves straight. The
+                                calibration factor is the ratio of the left motor <i>analogWrite</i> value to the right
+                                motor <i>analogWrite</i> value in order for the car to go straight. The calibration
+                                factor was found to be 0.9.
+                            </p>
+
+                            <div style="text-align: center;">
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/8sCfYPwavjc"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/TNTFnCuHxGQ"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                <figcaption>Figure 7. Uncalibrated and calibrated open loop control</figcaption>
+                            </div>
+
+                            <div class="flex-grow-1">
+                                <h3 class="mb-1">Open loop control via BLE</h3>
+                                <div class="subheading mb-2">Code</div>
+                                <p>
+                                    To control the car via BLE, new commands <i>MOVE_FORWARD</i>, <i>MOVE_BACKWARD</i>,
+                                    <i>TURN_RIGHT</i>, and <i>TURN_LEFT</i> are added. A <i>control.ino</i> file is
+                                    defined to define the implementation details of these commands. The bluetooth
+                                    command handler seen in previous labs then calls these functions to execute
+                                    movements based on incoming bluetooth commands.
+                                </p>
+                                <p>
+                                    The <i>control.ino</i> file is shown below with implementations for each of the new
+                                    commands. Currently, the values will be set by the incoming bluetooth command. The
+                                    <i>LEFT_A</i>, <i>LEFT_B</i>, <i>RIGHT_A</i>, <i>RIGHT_B</i>, <i>time_ms</i>, and
+                                    <i>CALIBRATION_FACTOR</i> are macros defined in the <i>control.h</i> file. They are
+                                    13, 14, 15, 16, 750, and 0.9 respectively
+                                </p>
+                                <p> Turns are implemented by setting the left or right motor driver to a much larger
+                                    value than the other driver. Through experimentation, suitable values for a left and
+                                    right turn were found.</p>
+                                <script
+                                    src="https://gist.github.com/seanzhangw/d086d8b2b8471a31a3e251e3386b122c.js"></script>
+
+                                <p> The new cases within the <i>handle_command</i> function within our bluetooth
+                                    interface is shown below.</p>
+                                <script
+                                    src="https://gist.github.com/seanzhangw/5c60f465a7d3b884c1564825e3fd0f1d.js"></script>
+                                <div class="subheading mb-2">Demo</div>
+
+                                <p> The video below demonstrates open loop, unthethered control of our car via BLE.</p>
+                                <div style="text-align: center;">
+
+                                    <iframe width="560" height="315" src="https://www.youtube.com/embed/BF-MNU-oLxU"
+                                        title="YouTube video player" frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                    <figcaption>Figure 8. Open loop, unthethered control via BLE
+                                    </figcaption>
+                                </div>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h3 class="mb-1">Discussion</h3>
+                                <p>Much of this lab involved soldering and assembling hardware. Thus, much of the
+                                    success and reliability of the end product relied on the quality of the assembly.
+                                    The main challenge faced was achieivng reliable outputs from the motor driver. Loose
+                                    wire connections and poor solder joints meant my connections would be unreliable.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+    </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>

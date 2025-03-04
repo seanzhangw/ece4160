@@ -35,6 +35,8 @@
                 <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
                 <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
                 <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+
 
             </ul>
         </div>
@@ -69,212 +71,255 @@
                     </p>
                     <p>
                         On the car, the TOF sensors will be placed on the front and right side. In this configuration,
-                        obstacles to the left and behind will be missed.
+                        obstacles to the left and behind will be missed. If a task involves moving backwards, the right
+                        TOF sensor may need to be repositioned to the back.
                     </p>
                     <p>
-                        TODO: Wiring diagram
-                    </p>
-                </div>
-
-                <div class="flex-grow-1">
-                    <h3 class="mb-1">Battery and TOF Connections</h3>
-                    <!-- <div class="subheading mb-2">Connections</div> -->
-                    <p>The 3.3V and GND wires of the battery were cut and soldered to a JST connector. The Artemis can
-                        then run with the battery. The video below demonstrates achieving a bluetooth connection on
-                        battery power.</p>
-                    <div style="text-align: center;">
-
-                        <iframe width="560" height="315" src="https://www.youtube.com/embed/uFCZKMBGfcQ"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                        <figcaption>Figure 2: Artemis board connected to battery and establishing a bluetooth connection
-                        </figcaption>
-
-                    </div>
-                    <p>The TOF sensor was connected to the Artemis board using the Qwiic connector and a Qwicc breakout.
-                        An additional wire was conected from a GPIO to the XSHUT pin of one of the TOF sensors.
-
-                    <div style="text-align: center;">
-                        <img src="assets/img/lab3/physical_connections.png.jpg" alt="mac_address"
-                            style="max-width: 40%; height: auto;">
-                        <figcaption>Figure 3: Physical connections between the Artemis board and the TOF sensor
-                        </figcaption>
-                    </div>
-                </div>
-
-                <div class="flex-grow-1">
-                    <h3 class="mb-1">Single TOF</h3>
-                    <div class="subheading mb-2">I2C</div>
-                    <p>With a single TOF sensor, the I2C channel address can be scanned and printed to the serial
-                        monitor. The scanned address is 0x29. The LSB of the 8-bit address is a read/write flag, so 0x52
-                        << 1 yields 0x29 </p>
-
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/i2c_scan_found.png" alt="mac_address"
-                                    style="max-width: 50%; height: auto;">
-                                <figcaption>Figure 4: Apollo3 Example05_Wire_I2C script finding the TOF sensor address
-                                </figcaption>
-
-                            </div>
-
-                            <div class="subheading mb-2">Characterizing accuracy</div>
-                            <p>
-                                The TOF sensor has two operating modes available through the SparkFun_VL53L1X library:
-                                short and long. According to the <a
-                                    href="https://cdn.sparkfun.com/assets/8/9/9/a/6/VL53L0X_DS.pdf"
-                                    target="_blank">datasheet</a>, the short distance mode is able to detect
-                                the furthest distance under strong ambient light. While the long distance mode has the
-                                greatest range in the dark, the operation of the robot is unlikely to take
-                                place in dark environments. Thus, the short distance mode was selected for the TOF
-                                sensor.
-                            </p>
-
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/max_distance_vs_mode.png" alt="mac_address"
-                                    style="max-width: 50%; height: auto;">
-                                <figcaption>Figure 5: Maximum distance vs mode (Source: VL53L1X Datasheet)</figcaption>
-                            </div>
-                            <p>
-                                To characterize the accuracy, repeatability, and ranging time, 100 distance measurements
-                                are taken and sent over BLE to a laptop. The laptop then calculates the mean, and
-                                standard deviation, of the measurements. The data is also labeled with timestamps. By
-                                finding the mean difference between timestamps, the ranging time is determined.
-                            </p>
-                            <p> The code below shows the implementation of taking distance measurements and sending them
-                                over BLE. </p>
-                            <script
-                                src="https://gist.github.com/seanzhangw/e0adb050111eebcb056af680d969440f.js"></script>
-
-                            <p> The code below shows the implementation of the <i>blockReadTOF1(int * res)</i> function
-                                used
-                                above.</p>
-                            <script
-                                src="https://gist.github.com/seanzhangw/9fff8eab573c8465bdd4402ef2c317cd.js"></script>
-
-                            <p> The python analysis is done by setting up a notification handler, parsing the received
-                                string, and populating data arrays. Numpy functions are then used to calculate the mean,
-                                standard deviation, and ranging time values. </p>
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/char_accuracy_time_ex.png" alt="mac_address"
-                                    style="max-width: 50%; height: auto;">
-                                <figcaption>Figure 6: Python analysis of distance measurements and timestamps
-                                </figcaption>
-                            </div>
-
-                            <p>
-                                The graphs below illustrate the measured distance, standard deviation, and ranging time
-                                on the y-axis and actual distance on the x-axis. The TOF mean measured distance over 100
-                                samples closely resembles the actual distance through 3 meters. Above 1.5 meters, the
-                                TOF measured distance is a slight overestimate. The TOF measured distance is reliable
-                                within 3 millimeters of standard deivation up to 2.5 meters of actual distance. The
-                                ranging time also did
-                                not fluctuate greatly with consistent times of ~96 ms. The data was collected
-                                with the setup
-                                also shown below.
-                            </p>
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/measuring_accuracy_setup.jpg" alt="mac_address"
-                                    style="max-width: 50%; height: auto;">
-                                <figcaption>Figure 7: Measurement setup for characterizing accuracy
-                                </figcaption>
-                            </div>
-
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/TOF_Mean_vs_distance.png" alt="mac_address"
-                                    style="max-width: 80%; height: auto;">
-                                <figcaption>Figure 8: Mean measured distance vs actual distance
-                                </figcaption>
-                            </div>
-
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/Std_dev_vs_actual_distance.png" alt="mac_address"
-                                    style="max-width: 80%; height: auto;">
-                                <figcaption>Figure 9: Measurement standard deviation vs actual distance
-                                </figcaption>
-                            </div>
-
-                            <div style="text-align: center;">
-                                <img src="assets/img/lab3/ranging_time_vs_distance.png" alt="mac_address"
-                                    style="max-width: 80%; height: auto;">
-                                <figcaption>Figure 10: Ranging time vs actual distance
-                                </figcaption>
-                            </div>
-
-
-                </div>
-
-                <div class="flex-grow-1">
-                    <h3 class="mb-1">Dual TOF</h3>
-                    <div class="subheading mb-2">Setup</div>
-                    <p>
-                        To use two TOF sensors simultaneously, the active-low XSHUT pin of TOF sensor 2 is tied to GND,
-                        the address of the TOF sensor 1 is modified, and the XSHUT pin is set high to restart TOF sensor
-                        2. The code below shows the setup of the two TOF sensors.
-                    </p>
-                    <script src="https://gist.github.com/seanzhangw/98b501ec61dde984bd27743758d4e89f.js"></script>
-
-                    <script src="https://gist.github.com/seanzhangw/1d88ce4a622d06e6e735f01901244af2.js"></script>
-
-                    <div class="subheading mb-2">Dual Read Demonstration</div>
-
-                    <p> The video below demonstrates simultaneously reading from both TOF sensors. </p>
-                    <div style="text-align: center;">
-
-                        <iframe width="560" height="315" src="https://www.youtube.com/embed/f-Ka-NFDREs"
-                            title="YouTube video player" frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                        <figcaption>Figure 11: Simultaneously reading from both TOF sensors
-                        </figcaption>
-
-                    </div>
-                    <div class="subheading mb-2">Characterizing speed</div>
-                    <p>
-                        To characterize the speed of the TOF sensors, the Artemis clock is printed. If the distance
-                        sensor data is ready, the distance measurement is printed. The code below illustrates this
-                        implementation.
-                    </p>
-                    <script src="https://gist.github.com/seanzhangw/fbc07deab9dcc0ea16e4bb533fcd5475.js"></script>
-                    <p>
-                        A screenshot of the serial monitor is shown below. There is a 93 ms delay between TOF sensor 1
-                        distance measurements. This delay is consistent with TOF sensor 2 and other distance
-                        measurements. The loop executes every 4 ms, and a blocking TOF sensor read would be the limiting
-                        factor. To mitigate this, the TOF sensor read is done in a non-blocking manner.
+                        The diagram below shows the wiring diagram of the Artemis board and the 2 TOF sensors.
                     </p>
                     <div style="text-align: center;">
-                        <img src="assets/img/lab3/TOF_speed.png" alt="mac_address"
+                        <img src="assets/img/lab3/wiring_diagram.png.jpeg" alt="mac_address"
                             style="max-width: 50%; height: auto;">
-                        <figcaption>Figure 12: Serial monitor output of TOF sensor speed
+                        <figcaption>Figure 1: Wiring diagram of Artemis board and 2 TOF sensors
                         </figcaption>
                     </div>
 
                     <div class="flex-grow-1">
-                        <h3 class="mb-1">Bluetooth and Integration</h3>
-                        <div class="subheading mb-2">PDM</div>
-                        <p>
-                            The <i>START_RECORD</i> command from lab 2 was modified to measure TOF data as well as IMU
-                            data. The modified sampling and send loop is shown below.
-                        </p>
+                        <h3 class="mb-1">Battery and TOF Connections</h3>
+                        <!-- <div class="subheading mb-2">Connections</div> -->
+                        <p>The 3.3V and GND wires of the battery were cut and soldered to a JST connector. The Artemis
+                            can
+                            then run with the battery. The video below demonstrates achieving a bluetooth connection on
+                            battery power.</p>
+                        <div style="text-align: center;">
 
-                        <script src="https://gist.github.com/seanzhangw/53ff97c2b0623e3b28caa41f9113ffb7.js"></script>
-                        <p>
-                            The following graphs plot the TOF and IMU data over the same time period.
-                        </p>
-                        <div style="text-align: center;">
-                            <img src="assets/img/lab3/tof_over_time_simultaneous.png" alt="mac_address"
-                                style="max-width: 50%; height: auto;">
-                            <figcaption>Figure 13: TOF distance over time
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/uFCZKMBGfcQ"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 2: Artemis board connected to battery and establishing a bluetooth
+                                connection
                             </figcaption>
+
                         </div>
+                        <p>The TOF sensor was connected to the Artemis board using the Qwiic connector and a Qwicc
+                            breakout.
+                            An additional wire was conected from a GPIO to the XSHUT pin of one of the TOF sensors.
+
                         <div style="text-align: center;">
-                            <img src="assets/img/lab3/imu_over_time_simultaneous.png" alt="mac_address"
-                                style="max-width: 50%; height: auto;">
-                            <figcaption>Figure 14: IMU data over time
+                            <img src="assets/img/lab3/physical_connections.png.jpg" alt="mac_address"
+                                style="max-width: 40%; height: auto;">
+                            <figcaption>Figure 3: Physical connections between the Artemis board and the TOF sensor
                             </figcaption>
                         </div>
                     </div>
-                </div>
+
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Single TOF</h3>
+                        <div class="subheading mb-2">I2C</div>
+                        <p>With a single TOF sensor, the I2C channel address can be scanned and printed to the serial
+                            monitor. The scanned address is 0x29. The LSB of the 8-bit address is a read/write flag, so
+                            0x52
+                            << 1 yields 0x29 </p>
+
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/i2c_scan_found.png" alt="mac_address"
+                                        style="max-width: 50%; height: auto;">
+                                    <figcaption>Figure 4: Apollo3 Example05_Wire_I2C script finding the TOF sensor
+                                        address
+                                    </figcaption>
+
+                                </div>
+
+                                <div class="subheading mb-2">Characterizing accuracy</div>
+                                <p>
+                                    The TOF sensor has two operating modes available through the SparkFun_VL53L1X
+                                    library:
+                                    short and long. According to the <a
+                                        href="https://cdn.sparkfun.com/assets/8/9/9/a/6/VL53L0X_DS.pdf"
+                                        target="_blank">datasheet</a>, the short distance mode is able to detect
+                                    the furthest distance under strong ambient light. While the long distance mode has
+                                    the
+                                    greatest range in the dark, the operation of the robot is unlikely to take
+                                    place in dark environments. Thus, the short distance mode was selected for the TOF
+                                    sensor.
+                                </p>
+
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/max_distance_vs_mode.png" alt="mac_address"
+                                        style="max-width: 50%; height: auto;">
+                                    <figcaption>Figure 5: Maximum distance vs mode (Source: VL53L1X Datasheet)
+                                    </figcaption>
+                                </div>
+                                <p>
+                                    To characterize the accuracy, repeatability, and ranging time, 100 distance
+                                    measurements
+                                    are taken and sent over BLE to a laptop. The laptop then calculates the mean, and
+                                    standard deviation, of the measurements. The data is also labeled with timestamps.
+                                    By
+                                    finding the mean difference between timestamps, the ranging time is determined.
+                                </p>
+                                <p> The code below shows the implementation of taking distance measurements and sending
+                                    them
+                                    over BLE. </p>
+                                <script
+                                    src="https://gist.github.com/seanzhangw/e0adb050111eebcb056af680d969440f.js"></script>
+
+                                <p> The code below shows the implementation of the <i>blockReadTOF1(int * res)</i>
+                                    function
+                                    used
+                                    above.</p>
+                                <script
+                                    src="https://gist.github.com/seanzhangw/9fff8eab573c8465bdd4402ef2c317cd.js"></script>
+
+                                <p> The python analysis is done by setting up a notification handler, parsing the
+                                    received
+                                    string, and populating data arrays. Numpy functions are then used to calculate the
+                                    mean,
+                                    standard deviation, and ranging time values. </p>
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/char_accuracy_time_ex.png" alt="mac_address"
+                                        style="max-width: 50%; height: auto;">
+                                    <figcaption>Figure 6: Python analysis of distance measurements and timestamps
+                                    </figcaption>
+                                </div>
+
+                                <p>
+                                    The graphs below illustrate the measured distance, standard deviation, and ranging
+                                    time
+                                    on the y-axis and actual distance on the x-axis. The TOF mean measured distance over
+                                    100
+                                    samples closely resembles the actual distance through 3 meters. Above 1.5 meters,
+                                    the
+                                    TOF measured distance is a slight overestimate. The TOF measured distance is
+                                    reliable
+                                    within 3 millimeters of standard deivation up to 2.5 meters of actual distance. The
+                                    ranging time also did
+                                    not fluctuate greatly with consistent times of ~96 ms. The data was collected
+                                    with the setup
+                                    also shown below.
+                                </p>
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/measuring_accuracy_setup.jpg" alt="mac_address"
+                                        style="max-width: 50%; height: auto;">
+                                    <figcaption>Figure 7: Measurement setup for characterizing accuracy
+                                    </figcaption>
+                                </div>
+
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/TOF_Mean_vs_distance.png" alt="mac_address"
+                                        style="max-width: 80%; height: auto;">
+                                    <figcaption>Figure 8: Mean measured distance vs actual distance
+                                    </figcaption>
+                                </div>
+
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/Std_dev_vs_actual_distance.png" alt="mac_address"
+                                        style="max-width: 80%; height: auto;">
+                                    <figcaption>Figure 9: Measurement standard deviation vs actual distance
+                                    </figcaption>
+                                </div>
+
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/ranging_time_vs_distance.png" alt="mac_address"
+                                        style="max-width: 80%; height: auto;">
+                                    <figcaption>Figure 10: Ranging time vs actual distance
+                                    </figcaption>
+                                </div>
+
+                                <p>
+                                    The timing budget can be explicitly set with the function <i>setTimingBudget</i>. To
+                                    see how different ranging time effects accuracy and repeatbility, 100 samples are
+                                    taken at an actual distance of 50 cm. Intuitively, a higher ranging time lead to
+                                    more accurate measurements and smaller standard deviation.
+                                </p>
+
+                                <div style="text-align: center;">
+                                    <img src="assets/img/lab3/ranging_time_variable.png" alt="mac_address"
+                                        style="max-width: 80%; height: auto;">
+                                    <figcaption>Figure 11: Measured value accuracy depending on ranging time
+                                    </figcaption>
+                                </div>
+
+                    </div>
+
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Dual TOF</h3>
+                        <div class="subheading mb-2">Setup</div>
+                        <p>
+                            To use two TOF sensors simultaneously, the active-low XSHUT pin of TOF sensor 2 is tied to
+                            GND,
+                            the address of the TOF sensor 1 is modified, and the XSHUT pin is set high to restart TOF
+                            sensor
+                            2. The code below shows the setup of the two TOF sensors.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/98b501ec61dde984bd27743758d4e89f.js"></script>
+
+                        <script src="https://gist.github.com/seanzhangw/1d88ce4a622d06e6e735f01901244af2.js"></script>
+
+                        <div class="subheading mb-2">Dual Read Demonstration</div>
+
+                        <p> The video below demonstrates simultaneously reading from both TOF sensors. </p>
+                        <div style="text-align: center;">
+
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/f-Ka-NFDREs"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 12: Simultaneously reading from both TOF sensors
+                            </figcaption>
+
+                        </div>
+                        <div class="subheading mb-2">Characterizing speed</div>
+                        <p>
+                            To characterize the speed of the TOF sensors, the Artemis clock is printed. If the distance
+                            sensor data is ready, the distance measurement is printed. The code below illustrates this
+                            implementation.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/fbc07deab9dcc0ea16e4bb533fcd5475.js"></script>
+                        <p>
+                            A screenshot of the serial monitor is shown below. There is a 93 ms delay between TOF sensor
+                            1
+                            distance measurements. This delay is consistent with TOF sensor 2 and other distance
+                            measurements. The loop executes every 4 ms, and a blocking TOF sensor read would be the
+                            limiting
+                            factor. To mitigate this, the TOF sensor read is done in a non-blocking manner.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab3/TOF_speed.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 13: Serial monitor output of TOF sensor speed
+                            </figcaption>
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <h3 class="mb-1">Bluetooth and Integration</h3>
+                            <div class="subheading mb-2">PDM</div>
+                            <p>
+                                The <i>START_RECORD</i> command from lab 2 was modified to measure TOF data as well as
+                                IMU
+                                data. The modified sampling and send loop is shown below.
+                            </p>
+
+                            <script
+                                src="https://gist.github.com/seanzhangw/53ff97c2b0623e3b28caa41f9113ffb7.js"></script>
+                            <p>
+                                The following graphs plot the TOF and IMU data over the same time period.
+                            </p>
+                            <div style="text-align: center;">
+                                <img src="assets/img/lab3/tof_over_time_simultaneous.png" alt="mac_address"
+                                    style="max-width: 50%; height: auto;">
+                                <figcaption>Figure 14: TOF distance over time
+                                </figcaption>
+                            </div>
+                            <div style="text-align: center;">
+                                <img src="assets/img/lab3/imu_over_time_simultaneous.png" alt="mac_address"
+                                    style="max-width: 50%; height: auto;">
+                                <figcaption>Figure 15: IMU data over time
+                                </figcaption>
+                            </div>
+                        </div>
+                    </div>
         </section>
     </div>
     <!-- Bootstrap core JS-->
