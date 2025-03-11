@@ -48,7 +48,7 @@
             <div class="resume-section-content">
                 <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
                     <h2 class="mb-2">LAB 5:Linear PI control and Linear interpolation</h2>
-                    <div class="flex-shrink-0"><span class="text-primary2">Feb 28<sup>th</sup>, 2026</span></div>
+                    <div class="flex-shrink-0"><span class="text-primary2">March 11<sup>th</sup>, 2025</span></div>
                 </div>
                 The purpose of Lab 5 is to implement and tune a closed-loop controller for the car to move forward and
                 stop 1 foot away from a wall.
@@ -150,7 +150,10 @@
                             <figcaption>Figure 1: PI Controller Speed vs Time
                             </figcaption>
                         </div>
-
+                        <p>
+                            Note: A TOF vs time graph is omitted as it is the same as the PI controller's Proportional
+                            Error vs time graph with a translation of 300 mm.
+                        </p>
                         <div style="text-align: center;">
                             <img src="assets/img/lab5/pi_p_err.png" alt="mac_address"
                                 style="max-width: 50%; height: auto;">
@@ -188,32 +191,90 @@
                     </div>
                     <div class="flex-grow-1">
                         <h3 class="mb-1">Linear Interpolation</h3>
-                        <p>Linear interpolation is used to determine the distance between two points. The formula for
-                            linear interpolation is shown below.</p>
-                        <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
-                        <p> The function <i>linearInterpolation(...)</i> is used to determine the distance between two
-                            points. The function takes in the two points and the distance between the two points. The
-                            function then returns the distance between the two points. The function is used to determine
-                            the distance between the car and the wall. The distance is then used to determine the speed
-                            of the car. The speed of the car is determined by the PI controller. The PI controller then
-                            adjusts the speed of the car to reach the desired distance from the wall. The function
-                            <i>linearInterpolation(...)</i> is used to determine the distance between the car and the
-                            wall.
+                        <h4>Implementation</h4>
+                        <p>To further increase the frequency at which the control loop runs, linear interpolation is
+                            used to calcualte the car's position even when a TOF reading is not available. Two possible
+                            approaches are considered:
+                        <ol>
+                            <li>Linearly interpolate between the last two TOF position readings.</li>
+                            <li>Linearly interpolate between the last two positions (can be calculated or TOF
+                                positions).</li>
+                        </ol>
+                        In the second approach, errors in the TOF readings and in the linear interpolation calculations
+                        accumulated, eventually leading to erroneous values for the car's position. The first approach
+                        bases calculations on the TOF readings, which are more accurate than the calculated positions.
+                        The first approach is also not suseptible to the drift seen in the second approach. The
+                        implementation of the first approach is shown below.
                         </p>
-                        <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
-                        <p> The function <i>linearInterpolation(...)</i> is used to determine the distance between two
-                            points. The function takes in the two points and the distance between the two points. The
-                            function then returns the distance between the two points. The function is used to determine
-                            the distance between the car and the wall. The distance is then used to determine the speed
-                            of the car. The speed of the car is determined by the PI controller. The PI controller then
-                            adjusts the speed of the car to reach the desired distance from the wall. The function
-                            <i>linearInterpolation(...)</i> is used to determine the distance between the car and the
-                            wall.
+                        <script src="https://gist.github.com/seanzhangw/19e644eddf1e6d49a327d72030966f5c.js"></script>
+                        <p> The function <i>nonBlockReadTOF1(&distance1)</i> returns 0 on a successful read, and 1
+                            otherwise. For an unsuccessful read, the linear interpolation is done by using the last two
+                            successful readings. For a succesful read, the reading is stored in the <i>distance1</i>
+                            reference. Furthermore, the reading is stored into <i>last_tof</i> and <i>last_last_tof</i>,
+                            <i>time_between_tof</i>, and <i>last_tof_time</i> are adjusted to hold the new TOF reading,
+                            the last TOF reading, the time between the current TOF measurement and the last tof
+                            measurement, and the current TOF measurement respectively.
+                            Notably, a cast to the long data type is needed to prevent integer overflow during the
+                            calculation of the distance moved according to the last two tof readings.
+
                         </p>
-                        <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
-                        <p> The function <i>linearInterpolation(...)</i> is used to determine the distance between two
-                            points. The function takes in
+                        <h4 class="mb-1">Linear Interpolation Speed Discussion & Results</h3>
+                            <p>
+                                The control loop frequency increased to
+                                executing every ~10 ms. This translates to a frequency of ~100 Hz. The TOF sensor, with
+                                a timing budget of 20ms, returns data on average every 20 ms. Linear interpolation
+                                effectively doubles the frequency of the control loop if the loop is previously limited
+                                by the TOF sensor's sampling rate.
+                            </p>
+                            <p>
+                                With the same <i>P_GAIN</i>, <i>I_GAIN</i>, and <i>target_tof</i> values, the increased
+                                control loop frequency meant the speed of the <i>MAX_SPEED</i> of the car can be
+                                increased to 80. This is because the car can make more dynamic adjustments to its speed
+                                as it approaches the setpoint.
+                            <p>
+                                Graphs of the car's
+                                speed, distance from the setpoint, and the integral error are shown below. Notably, the
+                                variance in the TOF readings still causes some issues for the linear interpolation
+                                calculations. However, the mean values are accurate enough to still be an effective
+                                controller.
+                            </p>
+                            <div style="text-align: center;">
+                                <img src="assets/img/lab5/pi_extrapolate_speed.png" alt="mac_address"
+                                    style="max-width: 50%; height: auto;">
+                                <figcaption>Figure 6: Extrapolate PI Controller Speed vs Time
+                                </figcaption>
+                            </div>
+                            <p>
+                                Note: A TOF vs time graph is omitted as it is the same as the PI controller's
+                                Proportional
+                                Error vs time graph with a translation of 300 mm.
+                            </p>
+                            <div style="text-align: center;">
+                                <img src="assets/img/lab5/pi_extrapolate_p_err.png" alt="mac_address"
+                                    style="max-width: 50%; height: auto;">
+                                <figcaption>Figure 7: Extrapolate PI Controller Proportional Error vs Time
+                                </figcaption>
+                            </div>
+
+                            <div style="text-align: center;">
+                                <img src="assets/img/lab5/pi_extrapolate_i_err.png" alt="mac_address"
+                                    style="max-width: 50%; height: auto;">
+                                <figcaption>Figure 8: Extrapolate PI Controller Integral Error vs Time
+                                </figcaption>
+                            </div>
+                            <p>The videos below demonstrate the car reaching the 1-foot requirement with linear
+                                interpolation.</p>
+                            <div style="text-align: center;">
+
+                                <iframe width="560" height="315" src="https://www.youtube.com/embed/LLSi7Q9kEaQ"
+                                    title="YouTube video player" frameborder="0"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                                <figcaption>Figure 9: Extrapolate PI Controller Demonstration
+                                </figcaption>
+                            </div>
                     </div>
+
                 </div>
             </div>
         </section>
