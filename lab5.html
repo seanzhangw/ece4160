@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 5</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 5:Linear PI control and Linear interpolation</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">Feb 28<sup>th</sup>, 2026</span></div>
+                </div>
+                The purpose of Lab 5 is to implement and tune a closed-loop controller for the car to move forward and
+                stop 1 foot away from a wall.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">PRELAB</h3>
+                    <p>
+                        An effective debugging system is helpful for tuning and implementing a closed-loop controller.
+                        The debug interface used is a Bluetooth Low Energy (BLE) connection. Data is sent from the
+                        Artemis to a Jupyter Lab instance where data is processed and visualized.
+                    </p>
+                    <p>
+                        Sending data over BLE during a control loop is computationally expensive. To increase the
+                        frequency of the control loop, data is stored in a buffer and sent over BLE after a control task
+                        is finished. The buffer is then cleared and the process repeats.
+                    </p>
+                    <p>
+                        Below is the definition of the <i>ControlDataPacket</i> and the associated
+                        <i>ControlDataBuffer</i>. The packet contains all relevant data
+                        seen by the controller.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
+                    <p>This packet is populated by a <i>logControlData(...)</i> function. This function is called during
+                        each control loop and populated with the most recent data. </p>
+                    <script src="https://gist.github.com/seanzhangw/09544feaa31f1a278e46ec05d7050f47.js"></script>
+                    <p>After a control task is done executing, the <i>sendControlData(...)</i> function then writes the
+                        data in the <i>ControlDataBuffer</i> over the BLE connection.</p>
+                    <script src="https://gist.github.com/seanzhangw/90e7d11ae91da5420268ecc08468b1c4.js"></script>
+
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Designing a PI Controller</h3>
+                        <p>A PI controller is chosen for its ability to quickly converge to a solution with an
+                            effective proportional gain term while reducing
+                            the amount of steady-state error with an effective integral gain term.</p>
+                        <p>The control loop for the PI controller is shown below. The variables </p>
+                        <ol>
+                            <li><i>MAX_SPEED</i></li>
+                            <li><i>P_GAIN</i></li>
+                            <li><i>I_GAIN</i></li>
+                            <li><i>delay_time</i></li>
+                            <li><i>target_tof</i></li>
+                        </ol>
+                        <p> are configurable at run-time via BLE to assist in tuning and debugging. The output of the
+                            controller, <i>speed</i>, is clamped to the value set in <i>MAX_SPEED</i>. This is to
+                            prevent the car from moving too fast and overshooting the target distance. Furthermore, to
+                            prevent wind-up error where the integral term causes overshooting behavior, an error term of
+                            less than 20 sets the accumulated error to 0 to signal that a solution is reached. The
+                            <i>lastDirection</i> variable is an enum that holds the last direction the car traveled.
+                            Because of the car's high deadband, the car struggles to change direction or start from
+                            rest. To mitigate this, the car is given a small forward or backward motion if
+                            <i>lastDirection</i> is not consistent with the intended direction of movement.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/c3e88cee8921a5421bcdc4d4c78a8356.js"></script>
+
+                        <h4 class="mb-1">Range/Sampling time discussion</h4>
+                        <p>
+                            A quick execution time of the control loop is essential for a responsive controller. With
+                            the default parameters of the TOF sensors in SHORT mode, control loop executions occur every
+                            ~90 ms. This is very slow and causes large accumulations in the integral error.
+                        </p>
+                        <p>To decrease the sampling time of the TOF sensors, the function <i>setTimingBudget</i> is
+                            used. While decreasing the timing budget to 20 ms increases the variance of the TOF readings
+                            (shown
+                            with quantative data in lab 3), the control loop execution time decreases to ~15 ms. The
+                            tradeoff of higher variance for a quicker control loop is worth it because the faster loop
+                            means the car makes more dynamic adjustments depending on its current position. With the
+                            increased samples of the TOF sensor, the reading mean is still a very close approximation to
+                            the true distance. </p>
+
+                        <p>The SHORT ranging mode is used due to the increased sensitivity of the controller as the car
+                            nears the setpoint. When the car is far away, the speed is clamped anyway by the
+                            <i>MAX_SPEED</i> variable, making accurate long range measurements unnecessary.
+                        </p>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">PI Controller Values and Results</h3>
+                        <h4>Kp/Ki Justification</h4>
+                        <p> The controller is tuned to
+                            a <i>P_GAIN</i> of 0.1 and an <i>I_GAIN</i> of 0.00001, and a <i>target_tof</i> setpoint of
+                            300 (mm). During tuning, <i>P_GAIN</i> values
+                            with smaller orders of magnitude significantly increased the amount of time needed to be
+                            within 1-foot of a
+                            wall. Larger orders of magnitude meant the car would overshoot the setpoint and send the car
+                            into the wall. Smaller <i>I_GAIN</i> values meant the car would not converge to the converge
+                            to the correct steady state solution due to the speed adjustments being too small to
+                            overcome the motor's deadband. Larger <i>I_GAIN</i> values meant the car would overshoot the
+                            setpoint when released from a distance far away from the setpoint. The time taken to reach
+                            the setpoint meant the integral term would dominate.
+                        <h4>Graphs and Video Results</h4>
+                        Graphs of the
+                        car's distance from
+                        the setpoint, integral error, and the car's speed are shown below.
+                        </p>
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab5/pi_speed.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 1: PI Controller Speed vs Time
+                            </figcaption>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab5/pi_p_err.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 2: PI Controller Proportional Error vs Time
+                            </figcaption>
+                        </div>
+                        <p>Around 0.997 on the x-axis, the integral error term goes to 0. This is due to the wind-up
+                            protection previously mentioned. Since the error has reached a sufficiently small magnitude,
+                            the integral term is no longer used.</p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab5/pi_i_err.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 3: PI Controller Integral Error vs Time
+                            </figcaption>
+                        </div>
+                        <p>
+                            The videos below demonstrate the car reaching the 1-foot requirement on carpet and a
+                            wood floor.
+                        </p>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/CJMB9MTZkTU"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 4: PI Controller Performance on Wood</figcaption>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/29T2VsebiSU"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 5: PI Controller Performance on Carpet
+                            </figcaption>
+                        </div>
+                        <p>A PID controller would further prevent some of the overshooting present in the PI controller.
+                            However, a lack of time meant this controller was not implemented.</p>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Linear Interpolation</h3>
+                        <p>Linear interpolation is used to determine the distance between two points. The formula for
+                            linear interpolation is shown below.</p>
+                        <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
+                        <p> The function <i>linearInterpolation(...)</i> is used to determine the distance between two
+                            points. The function takes in the two points and the distance between the two points. The
+                            function then returns the distance between the two points. The function is used to determine
+                            the distance between the car and the wall. The distance is then used to determine the speed
+                            of the car. The speed of the car is determined by the PI controller. The PI controller then
+                            adjusts the speed of the car to reach the desired distance from the wall. The function
+                            <i>linearInterpolation(...)</i> is used to determine the distance between the car and the
+                            wall.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
+                        <p> The function <i>linearInterpolation(...)</i> is used to determine the distance between two
+                            points. The function takes in the two points and the distance between the two points. The
+                            function then returns the distance between the two points. The function is used to determine
+                            the distance between the car and the wall. The distance is then used to determine the speed
+                            of the car. The speed of the car is determined by the PI controller. The PI controller then
+                            adjusts the speed of the car to reach the desired distance from the wall. The function
+                            <i>linearInterpolation(...)</i> is used to determine the distance between the car and the
+                            wall.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/7c4aa021aaa0c2a3db17ba29bfd9e4cd.js"></script>
+                        <p> The function <i>linearInterpolation(...)</i> is used to determine the distance between two
+                            points. The function takes in
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
