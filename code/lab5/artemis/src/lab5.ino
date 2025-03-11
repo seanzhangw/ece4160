@@ -64,6 +64,8 @@ struct ControlPacket
 
 ControlPacket ControlDataBuffer[DATA_BUFFER_SIZE];
 
+bool tofAvailable[DATA_BUFFER_SIZE];
+
 /*
  Log data to the buffer for a control packet
 */
@@ -95,6 +97,8 @@ void sendControlData(int i)
   tx_estring_value.append(ControlDataBuffer[i].tof_distance);
   tx_estring_value.append("|");
   tx_estring_value.append(ControlDataBuffer[i].dt);
+  tx_estring_value.append("|");
+  tx_estring_value.append(tofAvailable[i]);
   tx_characteristic_string.writeValue(tx_estring_value.c_str());
 }
 
@@ -119,6 +123,11 @@ int timingBudget;
 int left_speed;
 int right_speed;
 int delay_time;
+
+int last_tof;
+int last_last_tof;
+int time_between_tof;
+int last_tof_time;
 
 // enum for direction
 enum Direction
@@ -339,6 +348,12 @@ void handle_command()
 
     distanceSensor1.setTimingBudgetInMs(timingBudget);
 
+    blockReadTOF1(&distance1);
+    last_tof = distance1;
+    last_last_tof = distance1;
+    time_between_tof = 1;
+    last_tof_time = millis();
+
     integral_err = 0;
     lastDirection = Still;
     start_time = millis();
@@ -348,31 +363,32 @@ void handle_command()
       unsigned long current_time = millis();
       dt = current_time - last_time;
       last_time = current_time;
+
       if (nonBlockReadTOF1(&distance1))
       {
-        // Serial.println("TOF1 read failed");
-        if (dataIndex >= 2)
-        {
-          distance1 = (ControlDataBuffer[dataIndex - 1].tof_distance +
-                       (dt) * (ControlDataBuffer[dataIndex - 1].tof_distance - ControlDataBuffer[dataIndex - 2].tof_distance) / ControlDataBuffer[dataIndex - 1].dt);
-        }
-        else
-        {
-          blockReadTOF1(&distance1);
-        }
-      }
-      // Serial.println(distance1);
-      ControlDataBuffer[dataIndex].tof_distance = distance1;
-
-      err = distance1 - target_tof;
-      // Wind-up protection
-      if (abs(err) < 20)
-      {
-        integral_err = 0;
+        distance1 = (distance1 + (long)((current_time - last_tof_time) * (last_tof - last_last_tof)) / time_between_tof);
       }
       else
       {
-        integral_err = integral_err + (err * dt);
+        last_last_tof = last_tof;
+        last_tof = distance1;
+        time_between_tof = current_time - last_tof_time;
+        last_tof_time = current_time;
+      }
+      ControlDataBuffer[dataIndex].tof_distance = distance1;
+
+      err = distance1 - target_tof;
+      integral_err = integral_err + (err * dt);
+
+      // if (abs(err) < 10)
+      // {
+      //   integral_err = 0;
+      // }
+
+      // clamp integral error to only contribute to 1/2 of max speed
+      if (abs(integral_err * I_GAIN) > (MAX_SPEED / 2))
+      {
+        integral_err *= 1 / (MAX_SPEED / (2 * I_GAIN));
       }
       speed = (int)(err * P_GAIN + integral_err * I_GAIN);
 
@@ -391,7 +407,6 @@ void handle_command()
           moveForward(STATIC_TO_FORWARD_SPEED);
           delay(STATIC_TO_FORWARD_DELAY);
         }
-
         moveForward(speed);
         lastDirection = Forward;
       }
