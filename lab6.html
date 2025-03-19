@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 6</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 6: ORIENTATION CONTROL</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">March 19<sup>th</sup>, 2025</span></div>
+                </div>
+                The purpose of Lab 6 is to implement and tune a closed-loop controller for the car's orientation.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">PRELAB</h3>
+                    <p>
+                        An effective debugging system is helpful for tuning and implementing a closed-loop controller.
+                        The debug interface used is a Bluetooth Low Energy (BLE) connection. Data is sent from the
+                        Artemis to a Jupyter Lab instance where data is processed and visualized.
+                    </p>
+                    <p>
+                        Sending data over BLE during a control loop is computationally expensive. To increase the
+                        frequency of the control loop, data is stored in a buffer and sent over BLE after a control task
+                        is finished. The buffer is then cleared and the process repeats.
+                    </p>
+                    <p>
+                        Below is the definition of the <i>YawControlPacket</i> and the associated
+                        <i>YawControlDataBuffer</i>. The packet contains all relevant data
+                        seen by the controller.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/c543d4d70319f2554115fd6a8df9c3c4.js"></script>
+                    <p>This packet is populated by a <i>record_yaw_pid_data(...)</i> function. This function is called
+                        during
+                        each control loop and populated with the most recent data. </p>
+                    <script src="https://gist.github.com/seanzhangw/a4f8c96eecf7aa7347689d37a0aabdf8.js"></script>
+                    <p>After a control task is done executing, the <i>sendControlData(...)</i> function then writes the
+                        data in the <i>ControlDataBuffer</i> over the BLE connection.</p>
+                    <script src="https://gist.github.com/seanzhangw/0860e9f79b435bdae5bf6d34f1076b0a.js"></script>
+                    <p>
+                        In Jupyter Lab, a Python function reads and parses the sent strings. The data is parsed into
+                        Python arrays.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/466c4aabe2a8e238de94cccb07de3bdc.js"></script>
+                    <p>
+                        The data can then be plotted with Python libraries to easily visualize the data for debugging.
+                    </p>
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Digital Motion Processing (DMP)</h3>
+                        <p>
+                            The integral of the gyroscope reading is used to calculate the car's orientation. The
+                            gyroscope measures the rate of rotation, and by integrating this rate over time, the
+                            orientation angle can be determined. For roll and pitch, the accelerometer readings can be
+                            fused with gyroscope measurements with a complementary filter to mitigate drift and lower
+                            noise. However, the yaw angle cannot be calculated with the accelerometer due to gravity
+                            being parallel to the yaw axis. To minimize yaw drift, the digital motion processor (DMP) is
+                            used. The DMP is setup according to this <a
+                                href="https://fastrobotscornell.github.io/FastRobots-2025/tutorials/dmp.html">guide</a>.
+                        </p>
+                        <p>
+                            To prevent the DMP FIFO buffer from overflowing, data from the DMP is read with the
+                            <i>readDMPYaw()</i> function every time the <i>loop()</i> function is executed. The
+                            <i>readDMPYaw()</i> function calcualtes the yaw from the yaw DMP <i>readDMPYaw()</i>
+                            function calcualtes the yaw from the quarternion component data from the DMP. The yaw is
+                            then stored in a global variable.
+                        </p>
+                        <p>
+                            According to the IMU <a
+                                href="https://www.mouser.com/datasheet/2/813/DS_000189_ICM_20948_v1_3-2489786.pdf">datasheet</a>,
+                            the gyroscope can measure +/- 250 dps, +/- 500 dps, +/- 1000 dps, and +/- 2000 dps depending
+                            on the <i>GYRO_FS_SEL</i> register configuration. These specifications are enough for our
+                            application.
+                        </p>
+                    </div>
+                    <h3 class="mb-1">Designing a PD Controller</h3>
+                    <h4 class="mb-1">Infastructure</h4>
+                    <div>
+                        <p>
+                            To make tuning the controller easier, parameters such as <i>P_GAIN</i>, <i>D_GAIN</i> and
+                            <i>target_yaw</i> are configurable at runtime. The controller executes within the
+                            <i>loop()</i> function, allowing for bluetooth commands to be processed while the controller
+                            is running. This means the setpoint, gains and other parameters can be adjusted without
+                            stopping the controller.
+                        </p>
+                        <p> To start and stop the controller, the <i>YAW_CONTROL</i> command takes in an argument that
+                            acts as a flag for starting the controller. Similarly, the <i>RECORD_PID_DATA</i> signals
+                            the controller to log data with the <i>record_yaw_pid_data(..)</i>.
+                        </p>
+                        <p>
+                            The control interface is modified to include <i>turnLeft(..)</i> and <i>turnRight(..)</i>
+                            functions. Corresponding BLE commands are added to allow for the car to turn left or right
+                            to tune the speed offsets to allow the car to perform tight turns.
+                        </p>
+                    </div>
+                    <h4 class="mb-1">P Controller</h4>
+                    <div>
+                        <p>One issue is determining whether to turn left or right based on whether the target angle is
+                            closer by going clockwise or counterclockwise. This requires calculating the shortest
+                            angular distance between the current orientation and the target orientation. This
+                            determination is made with the following algorithm: </p>
+                        <script src="https://gist.github.com/seanzhangw/1557320f2bc671c0b78a1053b3a7b71b.js"></script>
+
+                        <p>
+                            The step function for the P controller is shown below. The shortet angular distance is
+                            calculated using the algorithm above, and the error is scaled by the <i>P_GAIN</i> term.
+                            Depending on if the shortest path is in the clockwise or counter-clockwise direction, the
+                            car is turned left or right.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/ff8b99192a14bfa6ce4b970df581511a.js"></script>
+
+                        <p>
+                            The videos below demonstrate the P Controller's perforamnce on carpet and a wood floor.
+                        </p>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/LGg0-qsCv2Q"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 1: P Controller Performance on Carpet</figcaption>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/v7j9wNp6X1U"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 2: P Controller Performance on Wood
+                            </figcaption>
+                        </div>
+                        <p>
+                            The graphs below show the car's speed, proportional error, and orientation over time. With a
+                            Kp of 8 and a setpoint of 60 degrees, The P Controller quickly approaches but overshoots the
+                            target setpoint and oscillates around the setpoint. Note the wrapping from 360 to 0 in
+                            Figure 5 is a result of the scaling of yaw readings to a 0-360 degree range.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab6/p_ctrl_aggressive_speed_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 3: P Controller Speed vs Time
+                            </figcaption>
+                            <img src="assets/img/lab6/p_ctrl_aggressive_p_err_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 4: P Controller Error vs Time
+                            </figcaption>
+                            <img src="assets/img/lab6/p_ctrl_aggressive_yaw_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 5: P Controller Yaw vs Time
+                            </figcaption>
+                        </div>
+                    </div>
+                    <h4 class="mb-1">PD Controller</h4>
+                    <div>
+                        <p>
+                            To reduce the overshooting and oscillations seen in the P controller, a PD controller is
+                            implemented. The PD controller uses the derivative of the error to act as a dampening term
+                            as
+                            the car approaches the setpoint. The derivative term is calculated by taking the difference
+                            between the current error and the previous error and dividing by the time elapsed between
+                            the two errors.
+                        </p>
+                        <p>
+                            Taking the derivative of the change in yaw (which is the same as the change in error) is the
+                            same as the gyroscope output since the gyroscope output is integrated to find yaw. However,
+                            for ease of implementation, the derivative term is calculated directly using the yaw. This
+                            extra calculation did not result in a noticeable difference in the controller's speed.
+                        </p>
+                        <p>
+                            Taking the difference between only two error measurements can be noisy. Furthermore,
+                            changing setpoints can cause derivative kick as the change in error has a large
+                            instantaneous change. To reduce noise and the effect of derivative kick, the
+                            derivative term is passed through a low-pass filter. The three additional lines needed
+                            within the control loop are shown below. Instead of directly keeping track of the time
+                            between control loop executions, the average time between control loop executions is used.
+                            Line 3 is the low pass filter with configurable alpha to adjust the degree of filtering.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/b4e4dba3ee8ccc4268350a7fa6d1e15c.js"></script>
+
+                        <p>
+                            The videos below demonstrate the PD Controller's performance on carpet and when the car is
+                            interfered with.
+                        </p>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/KH7_B80yfpY"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 6: PD Controller Performance on Carpet</figcaption>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/688RinIVf60"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 7: PD Controller Performance with Interference
+                            </figcaption>
+                        </div>
+                        <p>
+                            The graphs below show the car's speed, proportional error, derivative error, and yaw over
+                            time. With the derivative term added, there is noticeable reduced overshooting.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab6/pd_ctrl_speed_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 8: PD Controller Speed vs Time
+                            </figcaption>
+                            <img src="assets/img/lab6/pd_ctrl_p_err_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 9: PD Controller P Error vs Time
+                            </figcaption>
+                            <img src="assets/img/lab6/pd_ctrl_d_err_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 10: PD Controller D Error vs Time
+                            </figcaption>
+                            <img src="assets/img/lab6/pd_ctrl_yaw_vs_time.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 11: PD Controller Yaw vs Time
+                            </figcaption>
+                        </div>
+                    </div>
+                    <h4 class="mb-1">Considering an Integral Term</h4>
+                    <p>
+                        The integral term was deemed unnecessary for the controller. The integral term is useful when
+                        the car fails to reach the setpoint. However, the car's consistently reaches the setpoint within
+                        reasonable time.
+                    </p>
+                    <h4 class="mb-1">Range/Sampling time discussion</h4>
+                    <p>
+                        A quick execution time of the control loop is essential for a responsive controller.
+                        While the exeuction time was limited by the TOF sensor in lab 5, the DMP outputs at rates up to
+                        55 Hz. The control loop is only limited by its own computation time.
+                    </p>
+                    <p>
+                        To characterize the control loop's exeuction time and frequency, the time between control loop
+                        executions is passed as part of the <i>YawControlPacket</i> data. The mean of this data is the
+                        average time between control loop executions, the control loop's frequency can be calculated.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab6/sampling_rate.png" alt="mac_address"
+                            style="max-width: 80%; height: auto;">
+                        <figcaption>Figure 12: Control Loop Sampling Rate
+                        </figcaption>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
