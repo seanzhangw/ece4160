@@ -102,7 +102,8 @@
                         <p>
                             To prevent the DMP FIFO buffer from overflowing, data from the DMP is read with the
                             <i>readDMPYaw()</i> function every time the <i>loop()</i> function is executed. The
-                            <i>readDMPYaw()</i> function calcualtes the yaw from the yaw DMP <i>readDMPYaw()</i>
+                            <i>readDMPYaw()</i> function calcualtes the yaw from the quarternion components output from
+                            the DMP. <i>readDMPYaw()</i>
                             function calcualtes the yaw from the quarternion component data from the DMP. The yaw is
                             then stored in a global variable.
                         </p>
@@ -110,7 +111,8 @@
                             According to the IMU <a
                                 href="https://www.mouser.com/datasheet/2/813/DS_000189_ICM_20948_v1_3-2489786.pdf">datasheet</a>,
                             the gyroscope can measure +/- 250 dps, +/- 500 dps, +/- 1000 dps, and +/- 2000 dps depending
-                            on the <i>GYRO_FS_SEL</i> register configuration. These specifications are enough for our
+                            on the programmable <i>GYRO_FS_SEL</i> register configuration. These specifications are
+                            enough for our
                             application.
                         </p>
                     </div>
@@ -151,7 +153,9 @@
                         <script src="https://gist.github.com/seanzhangw/ff8b99192a14bfa6ce4b970df581511a.js"></script>
 
                         <p>
-                            The videos below demonstrate the P Controller's perforamnce on carpet and a wood floor.
+                            The videos below demonstrate the P Controller's perforamnce on carpet and a wood floor. The
+                            <i>P_GAIN</i> is set to 8. Lower <i>P_GAIN</i> values lead to slower responses, while higher
+                            values lead to additional overshooting.
                         </p>
                         <div style="text-align: center;">
                             <iframe width="560" height="315" src="https://www.youtube.com/embed/LGg0-qsCv2Q"
@@ -200,7 +204,8 @@
                         <p>
                             Taking the derivative of the change in yaw (which is the same as the change in error) is the
                             same as the gyroscope output since the gyroscope output is integrated to find yaw. However,
-                            for ease of implementation, the derivative term is calculated directly using the yaw. This
+                            for ease of implementation, the derivative term is calculated directly using the DMP yaw.
+                            This
                             extra calculation did not result in a noticeable difference in the controller's speed.
                         </p>
                         <p>
@@ -216,7 +221,8 @@
 
                         <p>
                             The videos below demonstrate the PD Controller's performance on carpet and when the car is
-                            interfered with.
+                            interfered with. The <i>P_GAIN</i> was set to 8 and the <i>D_GAIN</i> was set to 0.5. Lower
+                            <i>D_GAIN</i> values lead to overshooting, while higher values lead to a slower response.
                         </p>
                         <div style="text-align: center;">
                             <iframe width="560" height="315" src="https://www.youtube.com/embed/KH7_B80yfpY"
@@ -233,7 +239,8 @@
                         </div>
                         <p>
                             The graphs below show the car's speed, proportional error, derivative error, and yaw over
-                            time. With the derivative term added, there is noticeable reduced overshooting.
+                            time at a setpoint of 90 degrees. With the derivative term added, there is noticeable
+                            reduced overshooting.
                         </p>
                         <div style="text-align: center;">
                             <img src="assets/img/lab6/pd_ctrl_speed_vs_time.png" alt="mac_address"
