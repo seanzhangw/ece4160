@@ -26,22 +26,25 @@ void moveCustom(int left_speed, int right_speed)
   analogWrite(LEFT_B, 0);
   analogWrite(RIGHT_A, 0);
   analogWrite(RIGHT_B, right_speed);
+  Serial.println("Moving custom");
+  Serial.println(left_speed);
+  Serial.println(right_speed);
 }
 
-void turnRight(int speed)
+void turnRight(int left_speed, int right_speed)
 {
-  analogWrite(LEFT_A, speed);
-  analogWrite(LEFT_B, speed);
-  analogWrite(RIGHT_A, 0);
+  analogWrite(LEFT_A, left_speed);
+  analogWrite(LEFT_B, 0);
+  analogWrite(RIGHT_A, right_speed * RIGHT_TURN_CALIBRATION_FACTOR);
   analogWrite(RIGHT_B, 0);
 }
 
-void turnLeft(int speed)
+void turnLeft(int left_speed, int right_speed)
 {
   analogWrite(LEFT_A, 0);
-  analogWrite(LEFT_B, 0);
-  analogWrite(RIGHT_A, speed);
-  analogWrite(RIGHT_B, speed);
+  analogWrite(LEFT_B, left_speed);
+  analogWrite(RIGHT_A, 0);
+  analogWrite(RIGHT_B, right_speed * LEFT_TURN_CALIBRATION_FACTOR);
 }
 
 void moveBackward(int speed)

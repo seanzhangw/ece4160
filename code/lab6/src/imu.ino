@@ -89,7 +89,7 @@ void setupIMU()
 
     // Set the DMP output data rate (ODR): value = (DMP running rate / ODR ) - 1
     // E.g. for a 5Hz ODR rate when DMP is running at 55Hz, value = (55/5) - 1 = 10.
-    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 0) == ICM_20948_Stat_Ok); // Set to the maximum
+    success &= (myICM.setDMPODRrate(DMP_ODR_Reg_Quat6, 2) == ICM_20948_Stat_Ok); // Set to the maximum
 
     // Enable the FIFO queue
     success &= (myICM.enableFIFO() == ICM_20948_Stat_Ok);

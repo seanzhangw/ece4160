@@ -10,6 +10,10 @@
 
 #define CALIBRATION_FACTOR 1.27
 
+#define RIGHT_TURN_CALIBRATION_FACTOR 1.67
+
+#define LEFT_TURN_CALIBRATION_FACTOR 1.67
+
 // TODO: figure out suitable initial values
 // float P_GAIN = 1;
 // float I_GAIN = 1;
@@ -18,9 +22,9 @@ void moveForward(int speed);
 
 void moveCustom(int left_speed, int right_speed);
 
-void turnRight(int speed);
+void turnRight(int left_speed, int right_speed);
 
-void turnLeft(int speed);
+void turnLeft(int left_speed, int right_speed);
 
 void moveBackward(int speed);
 

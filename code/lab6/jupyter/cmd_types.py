@@ -10,6 +10,8 @@ class CMD(Enum):
     FORWARD = 6
     BACKWARD = 7
     YAW_CONTROL = 8
-    RECORD_PID_DATA =9
-    SEND_PID_DATA = 10
-    STOP = 11
+    TURN_RIGHT = 9
+    TURN_LEFT = 10
+    RECORD_PID_DATA = 11
+    SEND_PID_DATA = 12
+    STOP = 13

@@ -5,7 +5,6 @@
 #include "tof.h"
 #include "control.h"
 #include "imu.h"
-#include <arduino-timer.h>
 #include <ArduinoBLE.h>
 
 /* ==================== BEGIN: BLUETOOTH DEFINES ============================ */
@@ -37,8 +36,7 @@ char buffer[50];
 /* ==================== END: BLUETOOTH DEFINES ============================== */
 
 // ==================== BEGIN: YAW TIMER SETUP ============================== */
-Timer<1> timer;
-volatile double yaw;
+double yaw;
 // ==================== END: YAW TIMER SETUP ================================ */
 
 #define RESOLUTION_BITS 16
@@ -78,6 +76,7 @@ struct YawControlPacket
   long time;
   int speed;
   int P_err;
+  double D_err;
   double yaw;
   int dt;
 };
@@ -124,7 +123,7 @@ void sendControlData(int i)
   Read the YAW value from the FIFO. This function needs to be called at a high
   frequency to avoid overflowing the FIFO and to get the most recent YAW value.
 */
-bool readDMPYaw(void *null)
+void readDMPYaw(double &yaw)
 {
   icm_20948_DMP_data_t data;
   myICM.readDMPdataFromFIFO(&data);
@@ -142,14 +141,18 @@ bool readDMPYaw(void *null)
 
       double siny_cosp = 2 * (q_w * q_z + q_x * q_y);
       double cosy_cosp = 1 - 2 * (q_y * q_y + q_z * q_z);
-      yaw = std::atan2(siny_cosp, cosy_cosp);
-      // Convert the quaternion to Euler angles...
 
-      Serial.println("YAW DIRECTLY FROM DMP: ");
-      Serial.println(yaw);
+      if (cosy_cosp != 0)
+      {
+        yaw = std::atan2(siny_cosp, cosy_cosp) * 180 / M_PI;
+      }
+
+      if (yaw < 0)
+      {
+        yaw = (double)360 + yaw;
+      }
     }
   }
-  return true;
 }
 
 /*
@@ -165,10 +168,15 @@ void sendYawControlData(int i)
   tx_estring_value.append("|");
   tx_estring_value.append(YawControlDataBuffer[i].P_err);
   tx_estring_value.append("|");
+  tx_estring_value.append(YawControlDataBuffer[i].D_err);
+  tx_estring_value.append("|");
   tx_estring_value.append(YawControlDataBuffer[i].yaw);
   tx_estring_value.append("|");
   tx_estring_value.append(YawControlDataBuffer[i].dt);
   tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+  Serial.println("SENT STRING: ");
+  Serial.println(tx_estring_value.c_str());
 
   Serial.println(yaw);
 }
@@ -235,6 +243,13 @@ int MAX_COUNTER_CLOCKWISE_SPEED = 80;
 int MIN_COUNTER_CLOCKWISE_SPEED = 40;
 int target_angle;
 
+// derivative terms
+double prev_yaw_err = 0.;
+double yaw_err_d = 0.;
+double filtered_yaw_err_d = 0.;
+float D_GAIN;
+float alpha = 0.1;
+
 double yaw_err;
 
 // =========================== END: PID ORIENTATION CONTROL =================
@@ -250,6 +265,8 @@ enum CommandTypes
   FORWARD,
   BACKWARD,
   YAW_CONTROL,
+  TURN_RIGHT,
+  TURN_LEFT,
   RECORD_PID_DATA,
   SEND_PID_DATA,
   STOP
@@ -531,7 +548,11 @@ void handle_command()
     success = robot_cmd.get_next_value(right_speed);
     if (!success)
       return;
-    moveCustom(left_speed, right_speed);
+    // moveCustom(left_speed, right_speed);
+    analogWrite(LEFT_A, 100);
+    analogWrite(LEFT_B, 0);
+    analogWrite(RIGHT_A, 0);
+    analogWrite(RIGHT_B, 127);
     break;
   case STOP:
     stop();
@@ -543,7 +564,7 @@ void handle_command()
     moveBackward(left_speed);
     break;
   case YAW_CONTROL:
-    // packet should be in the form of "yaw_control|target_yaw_value|max_clockwise_speed|min_clockwise_speed|max_counter_clockwise_speed|min_counter_clockwise_speed|P_GAIN"
+    // packet should be in the form of "yaw_control|target_yaw_value|max_clockwise_speed|min_clockwise_speed|max_counter_clockwise_speed|min_counter_clockwise_speed|P_GAIN|D_GAIN|alpha"
     success = robot_cmd.get_next_value(CONTROL_YAW);
     if (!success)
       return;
@@ -565,6 +586,31 @@ void handle_command()
     success = robot_cmd.get_next_value(P_GAIN);
     if (!success)
       return;
+    success = robot_cmd.get_next_value(D_GAIN);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(alpha);
+    if (!success)
+      return;
+    break;
+  case TURN_RIGHT:
+    success = robot_cmd.get_next_value(left_speed);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(right_speed);
+    if (!success)
+      return;
+    turnRight(left_speed, right_speed);
+
+    break;
+  case TURN_LEFT:
+    success = robot_cmd.get_next_value(left_speed);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(right_speed);
+    if (!success)
+      return;
+    turnLeft(left_speed, right_speed);
     break;
   case RECORD_PID_DATA:
     success = robot_cmd.get_next_value(RECORD_PID);
@@ -636,10 +682,6 @@ void setup()
 
   // Setup IMU
   setupIMU();
-
-  // Assuming DMP runs at 55 Hz, we will get a new reading every ~18ms. Run
-  // the readDMPYaw function every 17ms to be safe.
-  timer.every(17, readDMPYaw, nullptr);
 }
 
 void write_data()
@@ -669,24 +711,45 @@ void read_data()
 
 void pid_yaw_control()
 {
-  current_time = (float)millis();
-  dt = current_time - prev_time; // in ms
-  prev_time = current_time;
+  current_time = millis(); // for data logging
+  bool counter_clockwise = false;
+  // calculate proportional term
+  if (yaw < target_angle)
+  {
+    if (360 - target_angle + yaw < target_angle - yaw)
+    {
+      // clockwise case
+      yaw_err = 360 - target_angle + yaw;
+    }
+    else
+    {
+      // counter-clockwise case
+      yaw_err = target_angle - yaw;
+      counter_clockwise = true;
+    }
+  }
+  else
+  {
+    if (yaw - target_angle < 360 - yaw + target_angle)
+    {
+      // clockwise case
+      yaw_err = yaw - target_angle;
+    }
+    else
+    {
+      yaw_err = 360 - yaw + target_angle;
+      counter_clockwise = true;
+    }
+  }
 
-  yaw_err = yaw - target_angle;
-  // err_d = (err - prev_err) / dt;
-  // integral_err = integral_err + (err * dt);
-  // Wind-up protection
-  // if (integral_err > 10000) {
-  //   integral_err = 10000;
-  // }
-  // else if (integral_err < -10000) {
-  //   integral_err = -10000;
-  // }
-  // Calculate PWM signal
-  speed = (int)(P_GAIN * err);
-  // speed_control = Kp * err + Ki * integral_err + Kd * err_d;
-  if (speed > 0)
+  // calculate derivative term
+  yaw_err_d = (yaw_err - prev_yaw_err) / 0.008; // 0.008 comes from calculations to characterize contorl loop frequency
+  filtered_yaw_err_d = alpha * yaw_err_d + (1 - alpha) * filtered_yaw_err_d;
+  prev_yaw_err = yaw_err;
+
+  // calculate PWM signal
+  speed = (int)(P_GAIN * yaw_err + D_GAIN * filtered_yaw_err_d);
+  if (!counter_clockwise)
   {
     if (speed > MAX_CLOCKWISE_SPEED)
     {
@@ -696,37 +759,49 @@ void pid_yaw_control()
     {
       speed = MIN_CLOCKWISE_SPEED;
     }
-    turnRight(speed);
+    turnRight(speed, speed);
   }
   else
   {
-    if (speed < (-1 * MAX_COUNTER_CLOCKWISE_SPEED))
+    if (speed > (MAX_COUNTER_CLOCKWISE_SPEED))
     {
-      speed = -1 * MAX_COUNTER_CLOCKWISE_SPEED;
+      speed = MAX_COUNTER_CLOCKWISE_SPEED;
     }
-    else if (speed > (-1 * MIN_COUNTER_CLOCKWISE_SPEED))
+    else if (speed < (MIN_COUNTER_CLOCKWISE_SPEED))
     {
-      speed = -1 * MIN_COUNTER_CLOCKWISE_SPEED;
+      speed = MIN_COUNTER_CLOCKWISE_SPEED;
     }
-
-    turnLeft(-1 * speed);
+    turnLeft(speed, speed);
   }
-  // Serial.print("Angle: ");
-  // Serial.println(curr_angle);
-  // Serial.print("speed control: ");
-  // Serial.println(speed_control);
-  // prev_time = current_time;
-  // prev_err = err;
 }
 
-void record_yaw_pid_data(int i, int time, int speed, int P_err, double yaw, int dt)
+void record_yaw_pid_data(int i, int time, int speed, int P_err, double D_err, double yaw, int dt)
 {
   YawControlDataBuffer[i].time = time;
   YawControlDataBuffer[i].speed = speed;
-  YawControlDataBuffer[i].P_err;
+  YawControlDataBuffer[i].P_err = P_err;
+  YawControlDataBuffer[i].D_err = D_err;
   YawControlDataBuffer[i].yaw = yaw;
   YawControlDataBuffer[i].dt = dt;
 }
+
+// void loop()
+// {
+//   BLEDevice central = BLE.central();
+//   if (central)
+//   {
+//     Serial.print("Connected to: ");
+//     Serial.println(central.address());
+
+//     while (central.connected())
+//     {
+//       write_data();
+//       read_data();
+//     }
+
+//     Serial.println("Disconnected");
+//   }
+// }
 
 void loop()
 {
@@ -740,26 +815,18 @@ void loop()
     {
       write_data();
       read_data();
-      readDMPYaw(nullptr);
+      readDMPYaw(yaw);
       if (CONTROL_YAW)
       {
-        Serial.println("YAW IN CONTROL LOOP");
-        Serial.println(yaw);
-        Serial.println("attempting to control PID");
         pid_yaw_control();
         if (RECORD_PID)
         {
-          Serial.println("recording data");
-          record_yaw_pid_data(dataIndex, current_time, speed, err, yaw, dt);
+          record_yaw_pid_data(dataIndex, current_time, speed, yaw_err, int(filtered_yaw_err_d), yaw, dt);
           dataIndex++;
         }
-      }
-      else
-      {
-        stop();
       }
     }
     Serial.println("Disconnected");
   }
-  timer.tick();
+  readDMPYaw(yaw);
 }
