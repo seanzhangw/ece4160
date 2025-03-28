@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 7</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab7.html">LAB 7</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 7: KALMAN FILTERING</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">March 19<sup>th</sup>, 2025</span></div>
+                </div>
+                The purpose of Lab 7 is to implement Kalman Filtering for the car's TOF readings. This will allow us to
+                repeat the task in lab 5 with a higher max speed.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">Estimating Drag and Momentum</h3>
+                    <p>
+                        To find the drag and momentum coefficients, data from a step response is logged. To simulate a
+                        step response that simulates the dynamics of the PID control in lab 5, a PWM value of 80 is
+                        selected to correspond with a u term of 1.
+                    </p>
+                    <p>
+                        The graphs for TOF sensor output, the car's velocity, and motor input vs time (seconds) are
+                        shown below. A linear fit on the section of the TOF sensor output vs time is also shown.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab7/linear-fit-tof-vs-time.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 1: TOF vs Time
+                        </figcaption>
+                        <img src="assets/img/lab7/step-response-calc-velocity.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 2: Velocity vs Time
+                        </figcaption>
+                        <img src="assets/img/lab7/step-response-motor.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 3: Motor Input vs Time
+                        </figcaption>
+                    </div>
+                    <p>
+                        The linear fit region of the TOF sensor output vs time graph is used to calculate the drag
+                        coefficient. The linear fit is represented by the equation:
+                    <div style="text-align: center; margin-top: 10px;">
+                        <span style="font-style: italic; font-size: 1.2em;">y = -2681.97x + 5578.30</span>
+                    </div>
+                    </p>
+                    <p>
+                        Taking the derivative of the linear fit indicates that the steady state speed is 2681.97 mm/s.
+                        The drag coefficient is calculated to be
+                    <div style="text-align: center; margin-top: 10px;">
+                        <span style="font-style: italic; font-size: 1.2em;">d = u / 2681 = 1 / 2681 = 0.000372995</span>
+                    </div>
+                    </p>
+                    <p>
+                        The momentum term is found using the 90% rise time. From my data, a rise-time of 1.5 seconds is
+                        roughly selected. The momentum coefficient is calculated as
+
+                    <div style="text-align: center; margin-top: 10px;">
+                        <span style="font-style: italic; font-size: 1.2em;">m = -d * t_90 / ln(1 - 0.9) = (0.000372995 *
+                            1.5) / ln (0.1) = 0.000242984</span>
+                    </div>
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab7/d_m_calcs.png" alt="mac_address" style="max-width: 25%; height: 25%;">
+                        <figcaption>Figure 4: Drag and Momentum Coefficient Calculations
+                        </figcaption>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Initializing the Kalman Filter (PYTHON)</h3>
+                        <p>
+                            With our drag and momentum coefficients determined, we can initialize our A and B matrices.
+                        </p>
+                        <p>
+                            \[
+                            A =
+                            \begin{bmatrix}
+                            0 & 1 \\
+                            0 & -\frac{d}{m}
+                            \end{bmatrix} =
+                            \begin{bmatrix}
+                            0 & 1 \\
+                            0 & -1.53505673
+                            \end{bmatrix}
+                            \]
+                        </p>
+                        <p>
+                            \[
+                            B =
+                            \begin{bmatrix}
+                            0 \\
+                            \frac{1}{m}
+                            \end{bmatrix} =
+                            \begin{bmatrix}
+                            0 \\
+                            4115.4879
+                            \end{bmatrix}
+                            \]
+                        </p>
+                        <p>
+                            The discretized A and B matricies are initialized as shown below. The Delta T is the time
+                            between TOF
+                            sensor readings. The time between control loop executions is logged. Taking the mean of
+                            these values, we can calculate the average time between control loop executions to be 0.1s.
+                        </p>
+                        <p>
+                            \[
+                            A_d = I + \Delta T \cdot A =
+                            \begin{bmatrix}
+                            1 & 0 \\
+                            0 & 1
+                            \end{bmatrix}
+                            + 0.1 \cdot
+                            \begin{bmatrix}
+                            0 & 1 \\
+                            0 & -\frac{d}{m}
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                            1 & 0.1 \\
+                            0 & 1 + 0.1 \cdot \left(-\frac{d}{m} \right)
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                            1 & 0.1 \\
+                            0 & 1.15350567
+                            \end{bmatrix}
+                            \]
+                        </p>
+                        <p>
+                            \[
+                            B_d = \Delta T \cdot B =
+                            0.1 \cdot
+                            \begin{bmatrix}
+                            0 \\
+                            \frac{1}{m}
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                            0 \\
+                            \frac{0.1}{m}
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                            0 \\
+                            41.154879
+                            \end{bmatrix}
+                            \]
+                        </p>
+
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/discretized_matrices.png" alt="mac_address"
+                                style="max-width: 25%; height: 25%;">
+                            <figcaption>Figure 5: Discretized A and B Matrices
+                            </figcaption>
+                        </div>
+                        <p>
+                            The C matrix represents the states we want to measure. Since we want the measure the car's
+                            distance away from the wall, we choose C as [-1, 0].
+                        </p>
+                        <p>
+                            The state vector x is initialized as
+                            [[-TOF[0], 0]]. This represents the initial distance from the wall.
+                        </p>
+                        <p>
+                            The covariance matricies for model and sensor noise are also initialized. For sensor
+                            noise, we found the standard deviation of the TOF sensor with a 100ms timing budget to be ~5
+                            mm. This comes from experiments performed in lab 3 that measured standard deviations of
+                            different timing budget estimates. As a rough estimate, this standard deviation is set to
+                            10mm to account for EMI from the motor control signals. THe measurement noise covariance
+                            matrix looks like this:
+                        </p>
+                        <p>
+                            \[
+                            \Sigma_z =
+                            \begin{bmatrix}
+                            10^2
+                            \end{bmatrix}
+                            \]
+                        <p>
+                            To calculate the process noise for ouir model's position and velocity, the following
+                            equation is used. The 10 term is an estimate of the mm and mm/s difference of the car's
+                            position and velocity after one second.
+                        </p>
+                        <p>
+                            \[
+                            \sigma_{\text{process, velocity}} = \sqrt{10^2 \cdot \frac{1}{0.1}} = \sqrt{100 \cdot 10} =
+                            \sqrt{1000} \approx 31.62
+                            \]
+                        </p>
+                        <p>
+                            Using our estimates for the standard deviation of process, velocity and sensor noise, our
+                            model covariance matrix looks like this:
+                        </p>
+                        <p>
+                            \[
+                            \Sigma_u =
+                            \begin{bmatrix}
+                            31.62^2 & 0 \\
+                            0 & 31.62^2
+                            \end{bmatrix}
+                            \]
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab7/process_sensor_noise_init.png" alt="mac_address"
+                            style="max-width: 25%; height: 25%;">
+                        <figcaption>Figure 6: Sensor and Model Covariance Matrices
+                        </figcaption>
+                    </div>
+                    <h3 class="mb-1">Implementing the Kalman Filter (PYTHON)</h3>
+                    <div>
+                        <p>
+                            The Kalman Filter is first implemented in Python and fitted to TOF distance data obtained in
+                            lab 5. The Kalman Filter is implemented as follows:
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/402b0564e8e8b7cd89e25bb74f5f554d.js"></script>
+                        <p> With the initial state, model, and sensor noise outlined in the previous section, we can
+                            then loop through the TOF data and motor control input data to calculate the
+                            Kalman Filter's predicted distance. The sigma matrix is the initial guess of the covariance
+                            matrix for the position and velocity uncertainty. The PWM is scaled by the max pwm value to
+                            a simulate a u term that is at most 1.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/3e9c6c0d9248b47390ea1edd6e63e777.js"></script>
+                        <p>
+                            With these initial values, the Kalman Filter's output versus the TOF sensor data is shown
+                            below. The filter output heavily follows the TOF sensor data. This is due to the low
+                            relative sensor noise standard deviation of 10 and high relative model noise standard
+                            deviations of 31.62.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/kalman-overfit.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 7: Overfit Kalman Filter Output vs TOF Sensor Data
+                            </figcaption>
+                        </div>
+                        <p>
+                            The Kalman Filter is rerun with adjusted sensor and model noise values. The sesnor noise
+                            standard deviation is
+                            adjusted to 30 while the position and velocity model noise standard devation are changed to
+                            10. This yields the following graph with higher trust in the model and lower trust in the
+                            sensor. The estimated distances are smoother and less noisy than the TOF sensor data.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/kalman-goodfit.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 8: Smoothed Kalman Filter Output vs TOF Sensor Data
+                            </figcaption>
+                        </div>
+                        <p>
+                            Along with the model and sensor covariance matricies, other factors include the initial
+                            state and covariance of our model. Poor initial guesses may lead to poor or high convergence
+                            times. Similarly, with a inaccurate initial covariance, the filter may be overconfident in
+                            its initial state and be less likely to adjust. The drag and momentum terms also effect
+                            performance. If the drag and momentum create accurate state transition and control input
+                            matricies, then the dynamics of the system are well-modeled and allow for accurate filter
+                            predictions.
+                        </p>
+                        <h3 class="mb-1">Implementing Kalman Filter on the Robot</h3>
+                        <p>
+                            A function <i>KF(..)</i> is created that takes in a flag that indicates whether data is
+                            ready, the scaled control input, and the distance from the TOF sensor. The function updates
+                            the Kalman Filter's predicted state and covariance matrix. If we do not have a new data
+                            point, no update step is needed.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/3cef049047435f7ce8af4340de144c99.js"></script>
+                        <p>
+                            This function is called inside the PI control function each iteration. The
+                            <i>nonBlockReadTOF1(&distance)</i> function indicates whether to set the data ready flag and
+                            returns the distance if data is ready. We then pass this flag, the last scaled control
+                            input, and the distance read by the TOF sensor to <i>KF(..)</i>. The Kalman Filter's
+                            prediction and/or update are available in the global matrix <i>x</i> where <i>x(0,0)</i>
+                            represents the prediction of the distance from the wall.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/39774690636e2d96a05126c9157956b6.js"></script>
+                        <p>
+                            The Kalman Filter's predictions were initially being made in the wrong direction as shown
+                            below. When a new TOF sensor reading is made, the Kalman Filter jumps down to the new TOF
+                            sensor reading. However, when data is not ready, the Kalman Filter predicts increases in
+                            distance, indicating that the car is moving away form the wall. This is fixed by inverting
+                            the sign of the control input.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/robot-kalman-sign-error.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 9: Kalman Filter Wrong Direction Prediction
+                            </figcaption>
+                        </div>
+                        <p>
+                            Once predictions are made in the correct direction, the Kalman Filter's output is shown
+                            below. The Kalman Filter seems to overpredict the speed of the car.
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/robot-kalman-overpredict.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 10: Kalman Filter Overpredict
+                            </figcaption>
+                        </div>
+                        This can be fixed by
+                        the increasing the momentum term. With a bigger momentum term, the discretized B matrix's
+                        <i>1/m</i> term is reduced. This mean's the Kalman Filter's predicted change in distance,
+                        which
+                        includes the <i>B * (-u)</i> term, will be smaller for an equivalent control input. The
+                        updated discretized B matrix is shown below calculated from a <i>m</i> term of 0.00030778:
+                        </p>
+                        <p>
+                            \[
+                            B_d = \Delta T \cdot B =
+                            0.1 \cdot
+                            \begin{bmatrix}
+                            0 \\
+                            \frac{1}{m}
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                            0 \\
+                            \frac{0.1}{0.00030778}
+                            \end{bmatrix}
+                            =
+                            \begin{bmatrix}
+                            0 \\
+                            32.49069
+                            \end{bmatrix}
+                            \]
+                        </p>
+                        <p>
+                            With this change, the Kalman Filter's output and the TOF sensor output is shown below. The
+                            Kalman Filter's output is
+                            much smoother and aligned with the TOF sensor data. The Kalman Filter's sensor and model
+                            noise values were kept consistent.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/robot-kalman-good-fit.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 11: Kalman Filter Good Fit
+                            </figcaption>
+                        </div>
+                        <p>
+                            Graphs are shown below of running PI control with the Kalman Filter, a max speed of 110, and
+                            a target distance of 300mm. This is a substantial increase from the 80mm max speed with
+                            linear interpolation in lab 5. Furthermore, lab 5 was run on carpet with higher friction
+                            while this lab was run
+                            on a tile floor.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab7/pi-graphs.png" alt="mac_address"
+                                style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 12: Kalman Filter PI Control Graphs
+                            </figcaption>
+                        </div>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/bcfo_CfvcrU"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 13: Kalman Filter PI Control Video
+                            </figcaption>
+                        </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core them</float>e JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>

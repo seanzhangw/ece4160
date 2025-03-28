@@ -83,6 +83,20 @@ struct YawControlPacket
 
 YawControlPacket YawControlDataBuffer[DATA_BUFFER_SIZE];
 
+// struct for storing control data
+struct KalmanControlPacket
+{
+  long time;
+  int speed;
+  int P_err;
+  double I_err;
+  int tof_distance;
+  float kalman_distance;
+  int dt;
+};
+
+KalmanControlPacket KalmanControlDataBuffer[DATA_BUFFER_SIZE];
+
 /*
  Log data to the buffer for a control packet
 */
@@ -117,6 +131,30 @@ void sendControlData(int i)
   tx_estring_value.append("|");
   tx_estring_value.append(tofAvailable[i]);
   tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+  Serial.println("Sending Control Data");
+}
+
+void sendKalmanControlData(int i)
+{
+  tx_estring_value.clear();
+  sprintf(buffer, "%ld", KalmanControlDataBuffer[i].time);
+  tx_estring_value.append(buffer);
+  tx_estring_value.append("|");
+  tx_estring_value.append(KalmanControlDataBuffer[i].speed);
+  tx_estring_value.append("|");
+  tx_estring_value.append(KalmanControlDataBuffer[i].P_err);
+  tx_estring_value.append("|");
+  tx_estring_value.append(KalmanControlDataBuffer[i].I_err);
+  tx_estring_value.append("|");
+  tx_estring_value.append(KalmanControlDataBuffer[i].tof_distance);
+  tx_estring_value.append("|");
+  tx_estring_value.append(KalmanControlDataBuffer[i].kalman_distance);
+  tx_estring_value.append("|");
+  tx_estring_value.append(KalmanControlDataBuffer[i].dt);
+  tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+  Serial.println("Sending Kalman Control Data");
 }
 
 /*
@@ -174,6 +212,11 @@ void sendYawControlData(int i)
   tx_estring_value.append("|");
   tx_estring_value.append(YawControlDataBuffer[i].dt);
   tx_characteristic_string.writeValue(tx_estring_value.c_str());
+
+  Serial.println("SENT STRING: ");
+  Serial.println(tx_estring_value.c_str());
+
+  Serial.println(yaw);
 }
 // global tracker for buffer index
 int dataIndex = 0;
@@ -249,6 +292,25 @@ double yaw_err;
 
 // =========================== END: PID ORIENTATION CONTROL =================
 
+// =========================== BEGIN: LAB 7  ==========================
+int record_data = 0;
+int start_kalman_filter_pid = 0;
+
+#include <BasicLinearAlgebra.h>
+using namespace BLA;
+
+Matrix<2, 2> Id = {1, 0, 0, 1};
+
+// drag and momentum, and delta t constants
+// float d = 0.000373;
+// float m = 0.000243;
+// float dt_kalman = 0.01;
+
+// // A and B and C matricies
+// Matrix<2, 2> A = {1, 1, 0, -d/m};
+// Matrix<2, 1> B = {0, 1/m};
+
+// =========================== END: LAB 7  ==========================
 enum CommandTypes
 {
   PING,
@@ -257,6 +319,7 @@ enum CommandTypes
   GET_TOF_300,
   FORWARD_CONTROLLED,
   FORWARD_EXTRAPOLATE,
+  KALMAN_CONTROL,
   FORWARD,
   BACKWARD,
   YAW_CONTROL,
@@ -536,6 +599,28 @@ void handle_command()
     }
     dataIndex = 0;
     break;
+  case KALMAN_CONTROL:
+    success = robot_cmd.get_next_value(start_kalman_filter_pid);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(P_GAIN);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(I_GAIN);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(MAX_SPEED);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(target_tof);
+    if (!success)
+      return;
+    success = robot_cmd.get_next_value(timingBudget);
+    if (!success)
+      return;
+    break;
+
+    distanceSensor1.setTimingBudgetInMs(timingBudget);
   case FORWARD:
     success = robot_cmd.get_next_value(left_speed);
     if (!success)
@@ -543,13 +628,17 @@ void handle_command()
     success = robot_cmd.get_next_value(right_speed);
     if (!success)
       return;
-    // moveCustom(left_speed, right_speed);
-    analogWrite(LEFT_A, 100);
-    analogWrite(LEFT_B, 0);
-    analogWrite(RIGHT_A, 0);
-    analogWrite(RIGHT_B, 127);
+    success = robot_cmd.get_next_value(RECORD_PID);
+    if (!success)
+      return;
+
+    distanceSensor1.setTimingBudgetInMs(timingBudget);
+    moveCustom(left_speed, right_speed);
     break;
   case STOP:
+    success = robot_cmd.get_next_value(RECORD_PID);
+    if (!success)
+      return;
     stop();
     break;
   case BACKWARD:
@@ -616,7 +705,7 @@ void handle_command()
     Serial.println("attempting to send over data");
     for (int i = 0; i < dataIndex; i++)
     {
-      sendYawControlData(i);
+      sendKalmanControlData(i);
     }
     dataIndex = 0;
     break;
@@ -676,7 +765,7 @@ void setup()
   setupTOF();
 
   // Setup IMU
-  setupIMU();
+  // setupIMU();
 }
 
 void write_data()
@@ -780,23 +869,140 @@ void record_yaw_pid_data(int i, int time, int speed, int P_err, double D_err, do
   YawControlDataBuffer[i].dt = dt;
 }
 
-// void loop()
-// {
-//   BLEDevice central = BLE.central();
-//   if (central)
-//   {
-//     Serial.print("Connected to: ");
-//     Serial.println(central.address());
+void record_step_response_data(int i, int time, int speed, int P_err, int I_err, int tof_distance, int dt)
+{
+  ControlDataBuffer[i].time = time;
+  ControlDataBuffer[i].speed = speed;
+  ControlDataBuffer[i].P_err = P_err;
+  ControlDataBuffer[i].I_err = I_err;
+  ControlDataBuffer[i].tof_distance = tof_distance;
+  ControlDataBuffer[i].dt = dt;
+}
 
-//     while (central.connected())
-//     {
-//       write_data();
-//       read_data();
-//     }
+float last_motor_pwm = 0;
+bool first_iteration = false;
 
-//     Serial.println("Disconnected");
-//   }
-// }
+Matrix<1, 2> C = {-1, 0};
+
+// Discretize matrices
+Matrix<2, 2> A_d = {1, 0.01, 0, 0.98464943};
+Matrix<2, 1> B_d = {0, 32};
+
+// process and measurement noise
+Matrix<2, 2> sig_u = {400, 0, 0, 400};
+Matrix<1, 1> sig_z = {400};
+
+// initial states
+Matrix<2, 2> sig = {25 ^ 2, 0, 0, 25 ^ 2};
+Matrix<2, 1> x = {2000, 0}; // fix this to refelct more accurately.
+
+void KF(bool data_ready, float u, float y)
+{
+  // Serial.println("Control Input:");
+  // Serial.println(u);
+  // Prediction
+  Matrix<1, 1> u_mat = {-u};
+  Matrix<2, 1> mu_p = A_d * x + B_d * u_mat;
+  Matrix<2, 2> sig_p = A_d * (sig * (~A_d)) + sig_u;
+
+  // Only calculate the update if we do not have a valid reading
+  if (data_ready)
+  {
+    // Serial.println("Data Ready");
+    // Update
+    Matrix<1, 1> sig_m = C * sig_p * (~C) + sig_z;
+    Invert(sig_m);
+    Matrix<2, 1> kf_gain = sig_p * (~C) * (sig_m);
+    Matrix<1, 1> y_mat = {y};
+    Matrix<1, 1> y_m = y_mat - C * mu_p;
+    x = mu_p + kf_gain * y_m;
+    // Serial.println(x(0, 0));
+    sig = (Id - kf_gain * C) * sig_p;
+  }
+  else
+  {
+    // Serial.println("Data Not Ready");
+    x = mu_p;
+    // Serial.println(x(0, 0));
+    sig = sig_p;
+  }
+}
+
+void pid_kalman_filter()
+{
+  current_time = millis();
+  dt = current_time - last_time;
+  last_time = current_time;
+  bool data_ready;
+  if (nonBlockReadTOF1(&distance1) == 0)
+  {
+    data_ready = true;
+  }
+  else
+  {
+    data_ready = false;
+    if (first_iteration)
+    {
+      data_ready = true;
+      first_iteration = false;
+    }
+  }
+
+  // Serial.println("Last motor pwm: ");
+  // Serial.println(last_motor_pwm);
+  // Serial.println("MAX SPEED: ");
+  // Serial.println(MAX_SPEED);
+  KF(data_ready, last_motor_pwm / MAX_SPEED, -distance1);
+  err = x(0, 0) - target_tof;
+  // Wind-up protection
+  if (abs(err) < 20)
+  {
+    integral_err = 0;
+  }
+  else
+  {
+    integral_err = integral_err + (err * 0.01);
+  }
+  speed = (int)(err * P_GAIN + integral_err * I_GAIN);
+
+  if (speed > MAX_SPEED)
+  {
+    speed = MAX_SPEED;
+  }
+  if (speed < -MAX_SPEED)
+  {
+    speed = -MAX_SPEED;
+  }
+  if (speed > 0)
+  {
+    if (lastDirection == Still)
+    {
+      moveForward(STATIC_TO_FORWARD_SPEED);
+      delay(STATIC_TO_FORWARD_DELAY);
+    }
+
+    moveForward(speed);
+    lastDirection = Forward;
+  }
+  else
+  {
+    moveBackward(-BACKWARD_MULTIPLIER * speed);
+    lastDirection = Backward;
+  }
+
+  last_motor_pwm = speed;
+}
+
+void record_kalman_filter_data(int i, int time, int speed, int P_err, double I_err, int distance, float kalman_distance, int dt)
+{
+  KalmanControlDataBuffer[i].time = time;
+  KalmanControlDataBuffer[i].speed = speed;
+  KalmanControlDataBuffer[i].P_err = P_err;
+  KalmanControlDataBuffer[i].I_err = I_err;
+  KalmanControlDataBuffer[i].tof_distance = distance;
+  KalmanControlDataBuffer[i].kalman_distance = kalman_distance;
+  KalmanControlDataBuffer[i].dt = dt;
+}
 
 void loop()
 {
@@ -810,18 +1016,22 @@ void loop()
     {
       write_data();
       read_data();
-      readDMPYaw(yaw);
-      if (CONTROL_YAW)
+      if (start_kalman_filter_pid)
       {
-        pid_yaw_control();
+        pid_kalman_filter();
         if (RECORD_PID)
         {
-          record_yaw_pid_data(dataIndex, current_time, speed, yaw_err, int(filtered_yaw_err_d), yaw, dt);
+          record_kalman_filter_data(dataIndex, current_time, speed, err, integral_err, distance1, x(0, 0), dt);
           dataIndex++;
         }
       }
+      else
+      {
+        stop();
+      }
     }
     Serial.println("Disconnected");
+    stop();
   }
-  readDMPYaw(yaw);
+  // readDMPYaw(yaw);
 }
