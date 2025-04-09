@@ -15,4 +15,4 @@ class CMD(Enum):
     TURN_LEFT = 11
     RECORD_PID_DATA = 12
     SEND_PID_DATA = 13
-    STOP = 14
+    STOP = 16

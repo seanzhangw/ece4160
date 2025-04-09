@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 8</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab7.html">LAB 7</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab8.html">LAB 8</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 8: Stunts!</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">April 8th<sup>th</sup>, 2025</span></div>
+                </div>
+                The purpose of Lab 8 is to use the Kalman Filter implemneted in Lab 7 to execute a stunt. The stunt will
+                involve driving the car towards a wall, performing a flip, and driving back across the start position.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">Software Implementation</h3>
+                    <h4 class="mb-1">Bluetooth Interface</h4>
+                    <p>
+                        A command <i>FLIP</i> is added. The command takes in arguments for
+                        the speed, the distance threshold to perform the flip, flags for recording data, the TOF
+                        sensor's timing budget, and the time to reverse after the flip is performed.
+                    </p>
+                    <p>
+                        A second command <i>SEND_FLIP_DATA</i> is added. This command iterates through the
+                        <i>FlipControlDataBuffer</i> array and sends data over Bluetooth. The data is then parsed by a
+                        listener within Jupyter Lab. The initialization of <i>FlipControlDataBuffer</i>, its contents,
+                        and the definition of the listener is shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/2cee69e2314ab7520126df04b879ed63.js"></script>
+                    <script src="https://gist.github.com/seanzhangw/b397a54f89ba10c0e35b0b2730ba2fe2.js"></script>
+                    <h4 class="mb-1">FLIP EXECUTION</h4>
+                    <p>
+                        The flip is executed by driving forward at a fast speed until the distance from the wall is
+                        less than a set distance threshold. The car then drives in reverse at a fast speed for a set
+                        time. The rapid change in speed causes the car to flip.
+                    </p>
+                    <p>
+                        To keep track of the current stage of the flip, an enum <i>FlipState</i> is created. The
+                        <i>FlipState</i> enum has three states: <i>FLIP_FORWARD</i>, <i>FLIP_BACKWARD</i>, and
+                        <i>FLIP_STOP</i>.
+                    </p>
+                    <p> If we have a new TOF sensor reading, the Kalman
+                        Filter performs an update and prediction step. Otherwise, only a prediction step is
+                        performed. This is the same implementation as Lab 7. If we are in the <i>FLIP_FORWARD</i> state,
+                        the car will drive forward at a fast speed. If the distance from the wall is less than the
+                        distance threshold, the car will stop and enter the <i>FLIP_BACKWARD</i> state. The car will
+                        then drive backward for a set time before entering the <i>FLIP_STOP</i> state. The car will then
+                        stop and wait for a new command.
+                    </p>
+                    <p>
+                        Open loop control is selected for the flip execution to prevent any slowdown from a closed-loop
+                        controller as the car approaches the wall. This is important as the
+                        car's speed is a large factor in the flip's success.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/e4a2c7b76cf88e9cfb82606a8f847946.js"></script>
+
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Demonstrations</h3>
+                        <p>
+                            The three demonstrations are shown below. The first two videos show imbalanced flips caused
+                            by uneven motor power and uneven weight distribution. The third video shows a balanced flip
+                            after adding a motor offset. However, in each example, the car is able to drive back across
+                            the starting line (the car may get blocked by obstacles but the car would reach the starting
+                            line had it not hit them).
+                        </p>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/DcsqU1KVZTw"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 1: Flip 1 (slightly imbalanced)
+                            </figcaption>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/kjLmU11OO-A"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 2: Flip 2 (imbalanced)
+                            </figcaption>
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/Td9xeOOSPCE"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 3: Flip 3 (balanced)
+                            </figcaption>
+                        </div>
+                        <p>
+                            The time-series plots of the Kalman Filter's predicted distance from the wall and the TOF
+                            sensor
+                            data, and motor input for each run are shown below. The Kalman Filter and TOF sensor data
+                            after the flip is not accurate due to the use of the <i>delay(..)</i> function during the
+                            reverse section. During this time, no new TOF readings are measured. The linear region is
+                            due to only one TOF sensor reading being measured before the car enters the <i>FLIP_STOP</i>
+                            state.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab8/run1.png" alt="mac_address" style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 4: Flip 1 Kalman Filter and TOF Sensor Data
+                            </figcaption>
+                            <img src="assets/img/lab8/run2.png" alt="mac_address" style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 5: Flip 2 Kalman Filter and TOF Sensor Data
+                            </figcaption>
+                            <img src="assets/img/lab8/run3.png" alt="mac_address" style="max-width: 50%; height: auto;">
+                            <figcaption>Figure 6: Flip 3 Kalman Filter and TOF Sensor Data
+                            </figcaption>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="mb-1">Challenges</h3>
+                        <p>
+                            Some time when into tuning the distance threshold to execute the flip at the correct
+                            distance from the wall. The run below shows an instance when the distance threshold was too
+                            large and the car flipped early.
+                        </p>
+                        <p>
+                            The weight distribution of the car is also adjusted. The battery is moved to the front of
+                            the car instead of the back.
+                        </p>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/oQODQwil7Fo"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 7: Flip 4 (early flip)
+                            </figcaption>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="mb-1">Blooper</h3>
+                        <div style="text-align: center;">
+                            <iframe width="560" height="315" src="https://www.youtube.com/embed/XyreGb_kDr0"
+                                title="YouTube video player" frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                            <figcaption>Figure 8: Disaster
+                            </figcaption>
+                        </div>
+                    </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core them</float>e JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
