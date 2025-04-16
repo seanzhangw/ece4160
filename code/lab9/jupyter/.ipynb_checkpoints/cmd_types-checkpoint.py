@@ -1,0 +1,21 @@
+from enum import Enum
+
+class CMD(Enum):
+    PING = 0
+    GET_TOF1 = 1
+    GET_TOF2 = 2
+    GET_TOF_300 = 3
+    FORWARD_CONTROLLED = 4
+    FORWARD_EXTRAPOLATE = 5
+    KALMAN_CONTROL = 6
+    FORWARD = 7
+    BACKWARD = 8
+    YAW_CONTROL = 9
+    TURN_RIGHT = 10
+    TURN_LEFT = 11
+    RECORD_PID_DATA = 12
+    SEND_PID_DATA = 13
+    FLIP = 14
+    SEND_FLIP_DATA = 15
+    SEND_YAW_MAPPING_DATA = 16
+    STOP = 17

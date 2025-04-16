@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 9</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab7.html">LAB 7</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab8.html">LAB 8</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab9.html">LAB 9</a></li>
+
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 9: Mapping</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">April 8th<sup>th</sup>, 2025</span></div>
+                </div>
+                Lab 9 combines orientation control and TOF sensor data to map an environment.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">Orientation Control</h3>
+                    <p>
+                        The car's orientation is obtained using the IMU with DMP. See the DMP setup and angle wrapping
+                        implementation in the Lab 6 writeup.
+                    </p>
+                    <p>
+                        The PD controller implemented in lab 6 is reused to control the car's orientation. The code is
+                        ommited in this writeup as the full code is included in lab 6. To allow for
+                        the car to turn at small angles, the proportional error term is increased. This allows the motor
+                        to reach a duty cycle high enough to overcome the static friction of the wheels when the error
+                        is small. After each step of the PD controller, the TOF sensor is read if data is ready. The TOF
+                        distance data, along with the car's orientation, and motor input are recorded.
+                    </p>
+                    <p>
+                        Data is logged with calls to the following function. The <i>distance</i> and <i>distance2</i>
+                        variables refer to outputs from the two TOF sensors. Only <i>distance</i> is used in post
+                        processing.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/f0705fe90b980510bf6c4fbe79eaa849.js"></script>
+                    <p>
+                        The following code snippet illustrates how the car is stepped through 36 angles from 0 to 360
+                        degrees. The <i>time.sleep(0.5)</i> call ensures TOF sensor measurements are taken at each
+                        setpoint.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/472b159838ee81cf632929f5522d406c.js"></script>
+                    <p>
+                        After the car finishes its 360 degree turn, a seperate command <i>SEND_YAW_MAPPING_DATA</i> is
+                        sent to
+                        the car to begin the transfer process of the recorded <i>YawMappingDataBuffer</i> data. 360
+                        degree turns were executed at each of the required marked positions in the lab (-3,-2), (5,3),
+                        (0,3), (5,-3), along with (0,0) as an extra position.
+                    </p>
+                    <p>
+                        The video below shows the car performing reasonable on-axis 360 degree turn.
+                    </p>
+                    <div style="text-align: center;">
+                        <iframe width="560" height="315" src="https://www.youtube.com/embed/GgOe4Oe0vh0"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                        <figcaption>Figure 1: On-axis turn w/ 10 degree setpoint increments
+                        </figcaption>
+                    </div>
+                    <p>
+                        The graphs below illustrate the motor input, the car's yaw, and the TOF sensor data over time.
+                    </p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab9/(0,0)-1-motor_input_and_yaw_vs_time.png" alt="mac_address"
+                            style="max-width: 80%; height: auto;">
+                        <figcaption>Figure 2: Motor Input, Yaw vs Time
+                        </figcaption>
+                        <img src="assets/img/lab9/(0,0)-1-yaw_and_distance_vs_time.png" alt="mac_address"
+                            style="max-width: 80%; height: auto;">
+                        <figcaption>Figure 3: TOF Data, Yaw vs Time
+                        </figcaption>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="mb-1">Post Processing</h3>
+                        <h4 class="mb-1">Loading in data</h4>
+                        <p>
+                            Data is loaded to and loaded from a csv file. A <i>load_data(..)</i> function is defined
+                            that takes in arguments to indicate which dataset to load. After the <i>load_data(..)</i>
+                            function is called, the data is able to be manipulated in global lists. The
+                            <i>load_data(..)</i> implementation is shown below.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/7ed28d41dae59d7ab1758a1460dd47b2.js"></script>
+                        <h4>Polar Coordinates</h4>
+                        <p>
+                            As an initial sanity check that the recorded data is accurate, polar coordiante plots are
+                            created for the data recorded at each position. The polar coordiante plots are created with
+                            the following function. After converting the yaw to radians, each angle is mapped to a
+                            radius that corresponds to the distance recorded at that angle. The polar coordiante plot is
+                            then created using the <i>matplotlib</i> library. The polar coordiante plots are shown
+                            below.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/b5621e8d19c6e590f7034968ae130be5.js"></script>
+                        <div style="text-align: center;">
+                            <!-- Row 1 -->
+                            <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                                <div>
+                                    <img src="assets/img/lab9/(0,0)-2-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 4: Polar Plot of (0,0) Data</figcaption>
+                                </div>
+                                <div>
+                                    <img src="assets/img/lab9/(5,3)-2-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 5: Polar Plot of (5,3) Data</figcaption>
+                                </div>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                                <div>
+                                    <img src="assets/img/lab9/(5,-3)-2-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 6: Polar Plot of (5,-3) Data</figcaption>
+                                </div>
+                                <div>
+                                    <img src="assets/img/lab9/(0,3)-2-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 7: Polar Plot of (0,3) Data</figcaption>
+                                </div>
+                            </div>
+
+                            <!-- Row 3 -->
+                            <div style="display: flex; justify-content: center; gap: 40px;">
+                                <div>
+                                    <img src="assets/img/lab9/(-3,-2)-1-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 8: Polar Plot of (-3,-2) Data</figcaption>
+                                </div>
+                            </div>
+                        </div>
+                        <p>
+                            To confirm that the polar coordiante plots are correct across multiple trials, two plots are
+                            shown next to eachother. The result for the (0, 0) position is shown below.
+                        </p>
+                        <div style="text-align: center;">
+                            <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                                <div>
+                                    <img src="assets/img/lab9/(0,0)-1-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 9: (0, 0) Trial 1</figcaption>
+                                </div>
+                                <div>
+                                    <img src="assets/img/lab9/(0,0)-2-yaw_vs_distance_polar.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 10: (0, 0) Trial 2</figcaption>
+                                </div>
+                            </div>
+                        </div>
+                        <h4>Converting to the global frame</h4>
+                        <p>
+                            To convert the global frame, we can use the transformation matrix below.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab9/transformation_matrix.ong.png" alt="mac_address"
+                                style="max-width: 100%; height: auto;">
+                            <figcaption>Figure 11: Transformation Matrix</figcaption>
+                        </div>
+                        <p>
+                            By orienting the car at the same initial position, the rotation matrix can be set to the
+                            identity matrix. The translation matrix is the x, y, and z-offsets of the car. Since we are
+                            not concerned with the z-axis, the transformation matrix is a 3x3 matrix instead.
+                        </p>
+                        <p>
+                            The <i>transform_data</i> function processes sensor data (yaw and distance) collected from a
+                            robot at a given origin to generate global Cartesian coordinates for plotting. It
+                            first loads the data for a specified trial and origin. The angles are converted to
+                            radians and used to compute local Cartesian coordinates, where the X and Y components are
+                            derived as x = -distance * cos(yaw) and y = -distance * sin(yaw) for my specific mounting of
+                            the TOF sensor onto the robot. The robot's origin is converted from feet to
+                            millimeters, and a homogeneous transformation matrix is applied to translate the local
+                            points into the global frame. The full implementation is shown below.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/e098bd95649bfed3e026c49162e705c7.js"></script>
+                        <p>
+                            Line 6 is an angle offset to account for some skew in the angle measurements. This is due to
+                            some drift by the DMP when the IMU is first initialized.
+                        </p>
+                        <p>
+                            Line 8 is to account for a translational offset between the TOF sensor and the center of the
+                            car. This way, measurements are with respect to the center of the car.
+                        </p>
+                        <p>
+                            The global frames of each mapped position is shown below.
+                        </p>
+                        <div style="text-align: center;">
+                            <!-- Row 1 -->
+                            <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                                <div>
+                                    <img src="assets/img/lab9/(0,0)-global_frame.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 12: (0,0) Global Frame</figcaption>
+                                </div>
+                                <div>
+                                    <img src="assets/img/lab9/(5,-3)-global_frame.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 13: (5,3) Global Frame</figcaption>
+                                </div>
+                            </div>
+
+                            <!-- Row 2 -->
+                            <div style="display: flex; justify-content: center; gap: 40px; margin-bottom: 20px;">
+                                <div>
+                                    <img src="assets/img/lab9/(5,-3)-global_frame.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 14: (5,-3) Global Frame</figcaption>
+                                </div>
+                                <div>
+                                    <img src="assets/img/lab9/(0,3)-global_frame.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 15: (0,3) Global Frame</figcaption>
+                                </div>
+                            </div>
+
+                            <!-- Row 3 -->
+                            <div style="display: flex; justify-content: center; gap: 40px;">
+                                <div>
+                                    <img src="assets/img/lab9/(-3,-2)-global_frame.png" alt="mac_address"
+                                        style="max-width: 100%; height: auto;">
+                                    <figcaption>Figure 16: (-3,-2) Global Frame</figcaption>
+                                </div>
+                            </div>
+                        </div>
+                        <p>
+                            After overlaying the global frames over eachother, the following graph is obatined. If I
+                            were to redo this lab, I would take less TOF measurements or adjust TOF sensor parameters
+                            such as increasing timing budget or integration time to produce a cleaner and less
+                            noisy graph.
+                        </p>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab9/global_map.png" alt="mac_address"
+                                style="max-width: 80%; height: auto;">
+                            <figcaption>Figure 17: Global Map Combined</figcaption>
+                        </div>
+                        <p>
+                            With a global map, we can overlay this map with lines that represent the walls of the
+                            obstacles. The walls are represented as a list of tuples as shown below. The lines are then
+                            added to the combined global map to yield the following graph.
+                        </p>
+                        <script src="https://gist.github.com/seanzhangw/cf7cc17d9d31c607ac552c1df4ab57ca.js"></script>
+                        <div style="text-align: center;">
+                            <img src="assets/img/lab9/global_map_overlay.png" alt="mac_address"
+                                style="max-width: 80%; height: auto;">
+                            <figcaption>Figure 18: Global Map with Lines</figcaption>
+                        </div>
+                        <div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core them</float>e JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>

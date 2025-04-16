@@ -811,6 +811,7 @@ void loop()
       write_data();
       read_data();
       readDMPYaw(yaw);
+      Serial.println(yaw);
       if (CONTROL_YAW)
       {
         pid_yaw_control();
