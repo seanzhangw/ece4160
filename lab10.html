@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 10</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab7.html">LAB 7</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab8.html">LAB 8</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab9.html">LAB 9</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab10.html">LAB 10</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 10: Localization (Sim)</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">April 23rd<sup>th</sup>, 2025</span></div>
+                </div>
+                Lab 10 involves implementing a Bayes Filter to localize an robot within a simulated environment. The
+                Bayes filter will allow accurate localization to be achieved.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">Prelab/Background</h3>
+                    <p>
+                        At a high level, a Bayes filter operates on a prior belief. The prior belief is the robot's
+                        belief of its position based on sensors and control inputs. As new measurements are taken, and
+                        new control inputs are performed, that belief is updated to reflect the new information.
+                    </p>
+                    <p>
+                        The pseuodo code for the Bayes filter is shown below. The Bayes filter uses a motion model and a
+                        sensor model to update the belief of the car's position. The motion model is used to predict the
+                        car's position based on the car's previous position and the control input (line 3). The sensor
+                        model is
+                        used to
+                        update the belief of the car's position based on the sensor measurements (line 4).
+                    </p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab10/bayes.png" alt="mac_address" style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 1: Bayes Filter Pseudocode (ECE 4160 Lecture 20) </figcaption>
+                    </div>
+                    <p>
+                        The filter is computed by iterating through all possible locations of the robot within its
+                        environment. To make this computable, the possible poses are discretized. Since the robot's
+                        state is 3-dimensional, the state space is a 3D grid, where each cell in the grid has an x, y,
+                        and theta position that corresponds to the x, y, and rotation of the robot.
+                    </p>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Implementation</h3>
+                    <h4 class="mb-1">compute_control</h4>
+                    <p>
+                        The prediction step of the Bayes filter relies on the motion model to compute the expected
+                        control input given a previous pose and a current pose. The control input is expressed as a
+                        rotation, a translation and a second rotation. The input poses are expressed as x, y,
+                        coordinates and theta for a degree of rotation.
+                    </p>
+                    <p>
+                        The <i>compute_control</i> implementation is shown below. The function follows the derived
+                        odometry model parameters shown in ECE 4160 Lecture 18. Notably, <i>math.degrees()</i> function
+                        converts the angles to radians. The <i>mapper.normalize_angle()</i> call normalizes the input
+                        angle to the range [-180, 180).
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab10/odometry-params.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 2: Compute Control Calculation</figcaption>
+                    </div>
+                    <script src="https://gist.github.com/seanzhangw/ece6d3f35df335aa6e06bd4ff3d176c8.js"></script>
+                    <h4>odom_motion_model</h4>
+                    <p>
+                        The motion model should calculate the probability that the robot reaches a position <i>x'</i>
+                        given the
+                        previous position <i>x</i> and the control input <i>u</i>. To calculate this, we first need to
+                        calculate the expected control input <i>expected_u</i> given the current and previous pose with
+                        the <i>compute_control</i> function. With a Gaussian distribution centered around the expected
+                        control input with a standard deivation of our degree of confidence in the odometry model, we
+                        can pass in each of the actual control parameters to the Gaussian distribution to get the
+                        probability of the robot reaching the position <i>x'</i> given the previous position <i>x</i>
+                        and the control input <i>u</i>. The <i>odom_motion_model</i> implementation is shown below.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab10/odom_model.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 2: Motion Model Calculation</figcaption>
+                    </div>
+                    <script src="https://gist.github.com/seanzhangw/2a6c9f39fd547a6b511b0afbe3c0fdaa.js"></script>
+                    <h4>prediction_step</h4>
+                    <p>
+                        With the motion model implemented, we can now implement the prediction step of the Bayes filter.
+                        The
+                        <i>prediction_step</i> function uses the previous belief <i>loc.bel[cx,cy,ca]</i> (the
+                        confidence that the car was in the location cx, cy, ca), and the motion model to calculate the
+                        probability the car is located in each position within the grid. This effectively implements
+                        line 3 of the Bayes Filter pseudocode shown above.
+                    </p>
+                    <p>
+                        As mentioned in the lab handout, previous beliefs that are below 0.0001 do not need to be
+                        calculated. These beliefs contribute very little to the overall belief and can be ignored. The
+                        <i>prediction_step</i> function is shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/cbca6e227307138deba6b47f594f4d6b.js"></script>
+                    <h4>sensor_model</h4>
+                    <p>
+                        After the prediction step, a sensor model is used to update the belief of the car's position.
+                        The sensor model is based on an array of true observations for each position within the grid.
+                        The robot's sensor measurements are passed into a Gaussian distribution centered around the true
+                        measurement with a standard deviation that reflects the noise level of the sensor. Effectively,
+                        this calculates the probability of the robot's sensor measurements are similar to the true
+                        mesaurements for a position within the environment.
+                    </p>
+                    <p>
+                        The <i>sensor_model</i> function is shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/6bc29cf2ad5d4eb4fbc4cdc0f6aaf09c.js"></script>
+                    <h4>update_step</h4>
+                    <p>
+                        The update step of the Bayes filter uses the sensor model to update the belief of the car's
+                        position. The <i>update_step</i> function takes in the previous belief and the sensor model to
+                        calculate the new belief. This effectively implements line 4 of the Bayes Filter pseudocode
+                        shown above.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/efca4e973a2f236ea142d092a81f933d.js"></script>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Results</h3>
+                    <p>
+                        We can deploy our Bayes filter to the simulated environment to localize the robot. In the
+                        following plot, the ground truth (the actual position of the robot) is shown in green, the Bayes
+                        filter localization is shown in blue, and localization with the odometry model is shown in red.
+                        As shown in the plot, the Bayes filter localization is comparable to the ground truth, while the
+                        odometry model localization is not.
+                    </p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab10/sim-localization.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 3: Localization Results</figcaption>
+                    </div>
+                    <div style="text-align: center;">
+                        <iframe width="560" height="315"
+                            src="https://www.youtube.com/embed/roUZ7qGnD1U?si=2cEwmTEDrTbhgtBW"
+                            title="YouTube video player" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                    </div>
+
+                    <p>
+                        The logs below show the prediction and update step outputs of the Bayes filter. The logs include
+                        the ground truth pose, and the most probable state after each iteration of the prediction and
+                        update step, along with the probability. The Bayes filter
+                        works especially well when the robot is closer to a boundary and drives with a minimal rotations
+                        in its control input. This could be due
+                        to more accurate distance sensor readings when the robot is closer to walls.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/e8e8548411d6e8c5cb903b8917244e73.js"></script>
+                </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core them</float>e JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
