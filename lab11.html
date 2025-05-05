@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 11</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab7.html">LAB 7</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab8.html">LAB 8</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab9.html">LAB 9</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab10.html">LAB 10</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab11.html">LAB 11</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 11: Localization (Real)</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">April 30th<sup>th</sup>, 2025</span></div>
+                </div>
+                Lab 11 involves implementing a Bayes Filter to localize an robot within a real environment. The
+                Bayes filter will allow accurate localization to be achieved.
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">Background</h3>
+                    <p>
+                        At the end of lab 10, we succesfully implemented a Bayes filter to localize a robot within a
+                        simulated environment. The Bayes filter used an update step (relies on the sensor model) and a
+                        prediction step (relies on the odemetry model) to localize the robot. Optimized
+                        implementations are provided in the <i>Localization</i> class which implements the Bayes
+                        filter.
+                    </p>
+                    <p>
+                        In lab 11, we will localize the robot within a real environment. However, since the robot's
+                        movement is very noisy, we will not have an odometry model for the prediction step. Instead,
+                        localization will depend on the update step based on TOF sensor readings. We need to implement
+                        the <i>RealRobot</i> class's <i>perform_operation_loop</i> method.
+                        The <i>perform_operation_loop</i> method should trigger a 360-degree turn of the robot, with TOF
+                        measurements taken throughout the turn.
+                    </p>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Implementation</h3>
+                    <h4>Artemis Code</h4>
+                    <p>
+                        To take TOF measurements at specific angles within the robot's 360-degree turn, we need to
+                        control the yaw of the robot. The DMP is used to obtain yaw readings from the robot's IMU (see
+                        setup in Lab 6). The <i>pid_yaw_control</i> function from Lab 6 is also reused to control the
+                        yaw of the robot with the PD controller.
+                    </p>
+                    <p>
+                        Whenever the <i>YAW_CONxTROL</i> command is sent over BLE, the following conditional within the
+                        main BLE loop is executed.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/bb96304b95e727da337be05081d23378.js"></script>
+                    <p>
+                        The first call to <i>pid_yaw_control</i> calculates and sets the PWM duty cycle to rotate the
+                        robot towards the target yaw. Whenever the robot's yaw is within 3 degrees of the target yaw and
+                        the <i>target_reached</i> flag is not true, we perform a blocking read from the TOF sensors and
+                        add the TOF reading to a data packet. The <i>target_reached</i> flag is then set to true to
+                        ensure we only record one TOF reading for each target yaw. This could be improved by taking
+                        multiple readings per target yaw and averaging them, but this was not necessary to achieve
+                        accurate localization for my robot.
+                    </p>
+                    <p>
+                        The robot code implementation has no sense that it is performing a 360-degree turn. It is only
+                        concerned with turning to a specific yaw and taking a TOF reading.
+                    </p>
+                    <h4>PERFORM_OBSERVATION_Loop</h4>
+                    <p>
+                        The <i>perform_observation_loop</i> function steps the robot through a 360-degree turn and
+                        parses the TOF and yaw received from the robot. The code below steps the robot through the
+                        360-degree turn in 15 degree increments. The <i>world.yaml</i> file is modified to set the
+                        <i>observation_count</i> parameter to 24 so the Bayes filter expects 24 TOF readings in 15
+                        degree increments. The arguments in the <i>YAW_CONTROL</i> command set various parameters for
+                        the PD yaw controller (see lab 6). The call to <i>time.sleep(1)</i> gives the robot time to
+                        rotate to the target yaw before a new target yaw is sent.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/b2925a009f1d9c92253902b8c7f7d23a.js"></script>
+                    <p>
+                        Once all TOF readings have been taken, the <i>perform_observation_loop</i> function sends a
+                        <i>SEND_YAW_MAPPING_DATA</i> command to signal the robot to send the TOF readings and
+                        corresponding yaw measurements over BLE. Similar to previous labs, a data handler is used to
+                        parse the incoming packets. The definition and call to <i>async def sleep_for_5_secs()</i> gives
+                        time for all packets to be sent over BLE. The <i>async</i> keyword is added to the
+                        <i>perform_observation_loop</i> definition and the <i>await</i> keyword is added to
+                        <i>perform_observation_loop</i> calls. This allows for <i>perform_observation_loop</i> to
+                        perform asynchronous non-blocking waits while data is sent over BLE.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/2ae04f3b05335fcc15a8af281a05c3b6.js"></script>
+                    <p>
+                        Once all data is received, the yaw measurements and the corresponding TOF readings are returned
+                        in numpy arrays. The entire function definition is shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/c1881eab2d4d62435b2c6d47f4049890.js"></script>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Simulation Results</h3>
+                    <h4>Virtual Robot</h4>
+                    <p>
+                        Localization is first tested in simulation with a simulated robot. The final plot with odometry
+                        model predictions, ground truth, and belief is shown below.
+                    </p>
+
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/sim-results.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 3: Virtual Sim Localization Plot</figcaption>
+                    </div>
+                    <h4>Real Robot</h4>
+                    <p>
+                        The real robot is tested within an environment at 4 different locations. The plots below show
+                        the localized poses (blue) with respect to the ground truth (green).
+                    </p>
+                    <h5>(-3, -2)</h5>
+                    <p>
+                        In this position, the localized pose is directly on top of the ground truth.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(-3,-2)-plot.png" alt="mac_address"
+                            style="max-width: 50%; height: auto%;">
+                        <figcaption>Figure 4: (-3,-2) Real Localization</figcaption>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(-3,-2)-data.png" alt="mac_address"
+                            style="max-width: 75%; height: auto;">
+                        <figcaption>Figure 5: (-3,-2) Real Localization Data</figcaption>
+                        <iframe src="https://www.youtube.com/embed/L4BAXY2NMgM" width="560" height="315"
+                            title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                        encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    </div>
+
+                    <h5>(0, 3)</h5>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(0,3)-plot.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 5: (0,3) Real Localization</figcaption>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(0,3)-data.png" alt="mac_address"
+                            style="max-width: 75%; height: auto;">
+                        <figcaption>Figure 6: (0,3) Real Localization Data</figcaption>
+                    </div>
+                    <h5>(5, -3)</h5>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(5,-3)-plot.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 6: (5,-3) Real Localization</figcaption>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(5,-3)-data.png" alt="mac_address"
+                            style="max-width: 75%; height: auto;">
+                        <figcaption>Figure 7: (5,-3) Real Localization Data</figcaption>
+                    </div>
+                    <h5>(5, 3)</h5>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(5,3)-plot.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 7: (5,3) Real Localization</figcaption>
+                    </div>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/(5,3)-data.png" alt="mac_address"
+                            style="max-width: 75%; height: auto;">
+                        <figcaption>Figure 8: (5,3) Real Localization Data</figcaption>
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Discussion</h3>
+                    <p>
+                        The Bayes filter is able to accurately localize the robot within a real environment. The
+                        localization is accurate to within 0.5 cm of the ground truth. The localization is also able to
+                        accurately localize the robot in a 360-degree turn.
+                    </p>
+                </div>
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core them</float>e JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>
