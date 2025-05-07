@@ -72,7 +72,7 @@ robot:
     # Number of observations during the rotation behavior
     # It is also the number of observations made in each discrete cell
     # Must be an integer
-    observations_count: 24
+    observations_count: 18
 
     # Maximum length used for ray tracing used to calculate the map
     ray_tracing_length: 6

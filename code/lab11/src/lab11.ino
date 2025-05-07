@@ -241,6 +241,8 @@ void readDMPYaw(double &yaw)
         yaw = std::atan2(siny_cosp, cosy_cosp) * 180 / M_PI;
       }
 
+      // Serial.println("Yaw: ");
+      // Serial.println(yaw);
       if (yaw < 0)
       {
         yaw = (double)360 + yaw;
@@ -1124,7 +1126,7 @@ void record_flip_control_data(int i, int time, int speed, int distance, float ka
 void record_yaw_mapping_data(int i, int time, double yaw, int distance, int distance2, int motor_input)
 {
   YawMappingDataBuffer[i].time = time;
-  YawMappingDataBuffer[i].yaw = yaw;
+  YawMappingDataBuffer[i].yaw = yaw - 360;
   YawMappingDataBuffer[i].distance = distance;
   YawMappingDataBuffer[i].distance2 = distance2;
   YawMappingDataBuffer[i].motor_input = motor_input;
@@ -1146,7 +1148,7 @@ void loop()
       if (CONTROL_YAW)
       {
         pid_yaw_control();
-        if (abs(yaw - target_angle) <= 3 && !targetReached)
+        if (abs(yaw - target_angle) <= 5 && !targetReached)
         {
           blockReadTOF1(&distance1);
           blockReadTOF2(&distance2);

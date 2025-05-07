@@ -171,7 +171,14 @@
                             title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
                         encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                     </div>
-
+                    <p>
+                        The robot localized itself perfectly in this position for the x and y positions (within the grid
+                        resolution). However, the angle belief is off. Looking at the map, the TOF reading near 170
+                        degrees (counterclockwise) closely reflects the TOF reading at 0 degrees. Furthermore, the robot
+                        did not rotate fully back to its original position, so it would not have seen the somewhat small
+                        TOF reading at 0 degrees. Had it seen this small TOF reading, I believe 170 degrees would have
+                        been ruled out due to 180 degrees having a large expected TOF reading.
+                    </p>
                     <h5>(0, 3)</h5>
                     <div style="text-align: center;">
                         <img src="assets/img/lab11/(0,3)-plot.png" alt="mac_address"
@@ -183,6 +190,8 @@
                             style="max-width: 75%; height: auto;">
                         <figcaption>Figure 6: (0,3) Real Localization Data</figcaption>
                     </div>
+                    <p>The robot localized itself decently well in the x and y positions. Again, the angle measurement
+                        is off. The TOF reading at 150 degrees closely resembles the TOF reading at 0 degrees. </p>
                     <h5>(5, -3)</h5>
                     <div style="text-align: center;">
                         <img src="assets/img/lab11/(5,-3)-plot.png" alt="mac_address"
@@ -194,6 +203,11 @@
                             style="max-width: 75%; height: auto;">
                         <figcaption>Figure 7: (5,-3) Real Localization Data</figcaption>
                     </div>
+                    <p>
+                        The localization is somewhat off from the ground truth. This could be due to the robot not
+                        rotating perfectly on-axis in this case. I believe the robot's battery was running low, causing
+                        motor behavior to be different.
+                    </p>
                     <h5>(5, 3)</h5>
                     <div style="text-align: center;">
                         <img src="assets/img/lab11/(5,3)-plot.png" alt="mac_address"
@@ -205,15 +219,39 @@
                             style="max-width: 75%; height: auto;">
                         <figcaption>Figure 8: (5,3) Real Localization Data</figcaption>
                     </div>
+                    <p>
+                        As with the previous position, the localization is somewhat off from the ground truth. As these
+                        last two positions were measured last, the robot's battery was still running low, causing the
+                        robot to turn poorly on its axis. This drift could be the reason for the poor localization.
+                    </p>
                 </div>
                 <div class="flex-grow-1">
                     <h3 class="mb-1">Discussion</h3>
                     <p>
-                        The Bayes filter is able to accurately localize the robot within a real environment. The
-                        localization is accurate to within 0.5 cm of the ground truth. The localization is also able to
-                        accurately localize the robot in a 360-degree turn.
+                        A table of ground truth values versus the localized poses is shown below. The localized poses
+                        are reasonably close to the ground truth values. Before lab 12, localization results can be
+                        improved with several methods:
+                    <ul>
+                        <li>Increasing and averaging the number of samples taken at each target yaw to reduce the effect
+                            of sensor noise.</li>
+                        <li>Refining the PD controller parameters for more accurate yaw orientations.</li>
+                        <li>Ensuring that the TOF sensor is pointed at an angle high enough to not read the floor.</li>
+                        <li>Tuning the sensor noise parameter.</li>
+                    </ul>
+                    <p>
+                        For all positions, the angle belief is significantly off from the ground truth. While I am still
+                        unsure of the exact reasoning for this, some possible explanations are:
+                        <li>The robot was rotated counterclockwise initially facing the leftward wall, which may be
+                            different than expected in the sensor model.</li>
+                        <li>The robot's final yaw is not the same as the initial yaw.</li>
+                        <li>Reliance on a single TOF sample for each orientation without changing the sensor noise
+                            parameter means unreliable measurements that are treated with high confidence.</li>
                     </p>
-                </div>
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/comp.png" alt="mac_address" style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 9: Real Localization Table</figcaption>
+                    </div>
         </section>
     </div>
     <!-- Bootstrap core JS-->
