@@ -1150,7 +1150,6 @@ void loop()
         pid_yaw_control();
         if (abs(yaw - target_angle) <= 5 && !targetReached)
         {
-          blockReadTOF1(&distance1);
           blockReadTOF2(&distance2);
           record_yaw_mapping_data(dataIndex, current_time, yaw, distance1, distance2, speed);
           dataIndex++;

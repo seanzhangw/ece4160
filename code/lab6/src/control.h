@@ -1,10 +1,10 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#define LEFT_A 13
-#define LEFT_B 14
-#define RIGHT_A 15
-#define RIGHT_B 16
+#define LEFT_A 3
+#define LEFT_B 5
+#define RIGHT_A 14
+#define RIGHT_B 15
 
 #define time_ms 750
 

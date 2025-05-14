@@ -42,7 +42,7 @@ void turnRight(int left_speed, int right_speed)
 {
   analogWrite(LEFT_A, left_speed);
   analogWrite(LEFT_B, 0);
-  analogWrite(RIGHT_A, right_speed * RIGHT_TURN_CALIBRATION_FACTOR);
+  analogWrite(RIGHT_A, right_speed);
   analogWrite(RIGHT_B, 0);
 }
 
@@ -51,7 +51,7 @@ void turnLeft(int left_speed, int right_speed)
   analogWrite(LEFT_A, 0);
   analogWrite(LEFT_B, left_speed);
   analogWrite(RIGHT_A, 0);
-  analogWrite(RIGHT_B, right_speed * LEFT_TURN_CALIBRATION_FACTOR);
+  analogWrite(RIGHT_B, right_speed);
 }
 
 void moveBackward(int speed)

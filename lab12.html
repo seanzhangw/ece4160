@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    <title>ECE 4160 LAB 12</title>
+    <link rel="icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <!-- Font Awesome icons (free version1)-->
+    <script src="https://use.fontawesome.com/releases/v5.15.4/js/all.js" crossorigin="anonymous"></script>
+    <!-- Google fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Saira+Extra+Condensed:500,700" rel="stylesheet"
+        type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Muli:400,400i,800,800i" rel="stylesheet" type="text/css" />
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link href="css/styles.css" rel="stylesheet" />
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top" id="sideNav">
+        <a class="navbar-brand js-scroll-trigger" href="#page-top">
+            <span class="d-block d-lg-none">Sean Zhang</span>
+            <span class="d-none d-lg-block"><img class="img-fluid img-profile rounded-circle mx-auto mb-2"
+                    src="assets/img/profile.jpg" alt="..." /></span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="index.html">MainPage</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab1.html">LAB 1</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab2.html">LAB 2</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab3.html">LAB 3</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab4.html">LAB 4</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab5.html">LAB 5</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab6.html">LAB 6</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab7.html">LAB 7</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab8.html">LAB 8</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab9.html">LAB 9</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab10.html">LAB 10</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab11.html">LAB 11</a></li>
+                <li class="nav-item"><a class="nav-link" href="lab12.html">LAB 12</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Page Content-->
+    <div class="container-fluid p-0">
+        <!-- lab1-->
+        <section class="resume-section" id="lab1">
+            <div class="resume-section-content">
+                <div class="d-flex flex-column flex-md-row justify-content-between mb-4">
+                    <h2 class="mb-2">LAB 12: Path Planning & Execution</h2>
+                    <div class="flex-shrink-0"><span class="text-primary2">May 13<sup>th</sup>, 2025</span></div>
+                </div>
+                Lab 12 involves navigating the robot through the world to a series of target waypoints. Several
+                approaches can be taken to complete this lab. This lab was done in collaboration with Albert Sun
+                (ays48).
+                <hr class="mb-3" />
+
+                <div class=" flex-grow-1">
+                    <h3 class="mb-1">Choosing an Initial Approach</h3>
+                    <p>
+                        We choose to navigate the robot to the target waypoints using through a pre-determined path and
+                        feedback control for driving and orientation. Since localization + runtime path execution
+                        depends on the robot's ability to accurately execute a path, this seemed like the logical first
+                        step.
+                    </p>
+                    <p>
+                        Commands are issued from offboard to the robot for each forward drive and turn. The robot then
+                        executes PID control to drive forward or turn until the target distance or angle. The distance
+                        is found with the TOF sensor and the angle is calculated with the DMP.
+                    </p>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Implementation</h3>
+                    <h4>Artemis Code</h4>
+                    <p>
+                        Lab 5 code is reused as a starting point to implement the PID controller for driving forward.
+                        Initially, the
+                        controller's setpoint was set to the target distance to travel. However, inaccurate sensor
+                        readings while the robot was in motion caused the robot to overshoot or undershoot the target
+                        distance. Thus, the setpoint was changed to the target distance away from the wall in front of
+                        the robot's heading. Linear interpolation is also used to speed up the execution of the PID
+                        control loop. An excerpt of the command handler is shown below.
+                    </p>
+
+                    <script src="https://gist.github.com/seanzhangw/3f6b2ee51771c8d8a2194f539781841c.js"></script>
+                    <p>
+                        The <i>PID(..)</i> function implementation is shown below. A clamping term is also added to the
+                        old implementation. This is to prevent the robot from overshooting its setpoint when driving for
+                        longer distances.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/e6c14e6c70144f7371c579cc3012e28f.js"></script>
+                    <p>
+                        Lab 6 code is reused as a starting point implement the PID controller for turning. In lab 6,
+                        Albert calculated the target setpoint as a relative yaw to the robot's current yaw. While this
+                        works for isolated turns, navigating for an extended amount of time meant errors would
+                        accumulate. The target setpoint was changed to the absolute yaw of the robot based on the DMP
+                        readings. The command handler is shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/6996ef81bef4429c5f065b3d2bcaaa49.js"></script>
+                    <p>
+                        The PID controller implementation is shown below. The <i>floor_turn</i> variable is made
+                        adjustable at run-time to tune the lowest value that is not within deadband and does not cause
+                        significant oscillations.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/4d1d66d8a9fec56b6dbbfb718ab0fd01.js"></script>
+                    <p>
+                        Commands for adjusting the drive and turn PID controller gains are also implemented. These allow
+                        us to adjust the gains at runtime to speed up the process of tuning controllers.
+                    </p>
+                    <h4>Python Code</h4>
+                    <p>
+                        On the Python side, we will send a series of drive and turn commands to the robot to execute the
+                        pre-planned path. The diagram below shows the path we will take and the TOF readings we expect
+                        during each drive command. The expected TOF readings were based partly on measurements and
+                        partly on runtime adjustments from failed runs.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab12/path_plan.jpg" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 1: Path to Follow and Expected TOF</figcaption>
+                    </div>
+                    <p>
+                        The seris of BLE commands that execute the path are shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/54c6103bb3328345bca0cacd793a8104.js"></script>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Pre-planned Path & Feedback Control Results</h3>
+                    <p>
+                        The video below shows an unpolished implementation of the pre-planned path and feedback control
+                        implementation before extensive tuning and adjustments of PID parameters and the path TOF
+                        distances. Notably, without the pauses between drives and turns, it is able to quickly navigate
+                        through the environment
+                        but does not navigate accurately to all the waypoints.
+                    </p>
+                    <div style="text-align: center;">
+                        <iframe src="https://www.youtube.com/embed/0GJlhLsykb0" width="560" height="315"
+                            title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                        encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <figcaption>Figure 2: Untuned implementation of Feedback Control for Path Execution</figcaption>
+                    </div>
+                    <p>
+                        The video below shows a more polished implementation of the pre-planned path and feedback
+                        control implementation after extensive tuning and adjustments of PID parameters and the path TOF
+                        distances. The robot is able to navigate through the environment and accurately reach all the
+                        waypoints.
+                    </p>
+                    <div style="text-align: center;">
+                        <iframe src="https://www.youtube.com/embed/OcZhnTmh_h8" width="560" height="315"
+                            title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                        encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <figcaption>Figure 3: Tuned implementation of Feedback Control for Path Execution</figcaption>
+                    </div>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Localization</h3>
+                    <p>
+
+                    </p>
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="mb-1">Challenges</h3>
+                    <p>
+                        Several challenges were encountered during the implementation of the pre-planned path and
+                        feedback
+                        control.
+                    </p>
+                    <h4>Inconsistent TOF readings</h4>
+                    <p>
+                        As mentioned earlier, the PID controller for driving forward's setpoint was initially base don
+                        distance traveled. This is implemented by taking an initial TOF reading then comparing
+                        subsequent TOF readings to the initial reading. However, this meant the first reading was
+                        extremely important, and a grossly inaccurate reading would ruin the run. PID control based on
+                        target distance is more robust to these one-off errors since the robot continuously takes TOF
+                        readings and calculates a new control signal.
+                    </p>
+                    <h4>DMP Drift</h4>
+                    <p>
+                        In cases where we have the robot on for an extended period of time, the DMP readings would
+                        drift to inaccurate values. This is likely due to the IMU's placement near the motor drivers. A
+                        quick and dirty solution would be to restart the Artemis before a run. This would be a bigger
+                        problem if we relied on localization.
+                    </p>
+                </div>
+                <!-- <div class="flex-grow-1">
+                    <h3 class="mb-1">Discussion</h3>
+                    <p>
+                        A table of ground truth values versus the localized poses is shown below. The localized
+                        poses
+                        are reasonably close to the ground truth values. Before lab 12, localization results can be
+                        improved with several methods:
+                    <ul>
+                        <li>Increasing and averaging the number of samples taken at each target yaw to reduce the
+                            effect
+                            of sensor noise.</li>
+                        <li>Refining the PD controller parameters for more accurate yaw orientations.</li>
+                        <li>Ensuring that the TOF sensor is pointed at an angle high enough to not read the floor.
+                        </li>
+                        <li>Tuning the sensor noise parameter.</li>
+                    </ul>
+                    <p>
+                        For all positions, the angle belief is significantly off from the ground truth. While I am
+                        still
+                        unsure of the exact reasoning for this, some possible explanations are:
+                        <li>The robot was rotated counterclockwise initially facing the leftward wall, which may be
+                            different than expected in the sensor model.</li>
+                        <li>The robot's final yaw is not the same as the initial yaw.</li>
+                        <li>Reliance on a single TOF sample for each orientation without changing the sensor noise
+                            parameter means unreliable measurements that are treated with high confidence.</li>
+                    </p>
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab11/comp.png" alt="mac_address" style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 9: Real Localization Table</figcaption>
+                    </div> -->
+        </section>
+    </div>
+    <!-- Bootstrap core JS-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core them</float>e JS-->
+    <script src="js/scripts.js"></script>
+</body>
+
+</html>

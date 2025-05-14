@@ -5,17 +5,17 @@ void setupTOF(void)
 {
   Wire.begin();
   Serial.println("VL53L1X Qwiic Test");
-  pinMode(SHUTDOWN_PIN, OUTPUT);
+  // pinMode(SHUTDOWN_PIN, OUTPUT);
 
-  // Set the address of TOF1 to 0xf5
-  digitalWrite(SHUTDOWN_PIN, LOW); // Shut down TOF2
-  distanceSensor1.setI2CAddress(0xf5);
-  digitalWrite(SHUTDOWN_PIN, HIGH); // Restart TOF2
+  // // Set the address of TOF1 to 0xf5
+  // digitalWrite(SHUTDOWN_PIN, LOW); // Shut down TOF2
+  // distanceSensor1.setI2CAddress(0xf5);
+  // digitalWrite(SHUTDOWN_PIN, HIGH); // Restart TOF2
 
-  while (distanceSensor1.begin() != 0) // Begin returns 0 on a good init
-  {
-    Serial.println("TOF1 failed to begin. Please check wiring. Freezing...");
-  }
+  // while (distanceSensor1.begin() != 0) // Begin returns 0 on a good init
+  // {
+  //   Serial.println("TOF1 failed to begin. Please check wiring. Freezing...");
+  // }
 
   while (distanceSensor2.begin() != 0) // Begin returns 0 on a good init
   {
@@ -23,8 +23,7 @@ void setupTOF(void)
   }
   Serial.println("TOF sensors online!");
 
-  
-  distanceSensor1.startRanging();
+  // distanceSensor1.startRanging();
   distanceSensor2.startRanging();
 }
 

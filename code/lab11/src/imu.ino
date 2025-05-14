@@ -129,7 +129,7 @@ void setupIMU()
 }
 
 float getAccelerometerPitch(ICM_20948_I2C *sensor)
-{
+{-
   sensor->getAGMT();
   float acc_x = sensor->accX();
   float acc_z = sensor->accZ();
