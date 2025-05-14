@@ -165,7 +165,31 @@
                 <div class="flex-grow-1">
                     <h3 class="mb-1">Localization</h3>
                     <p>
-
+                        We attempted localization but ultimately ran out of time before a complete implementation. We
+                        first implemented a function <i>localize_point(..)</i> that runs the update step to calculate an
+                        estimated pose. This function would be called after each drive command. In the implementation,
+                        the initial turn orients the robot to face the west wall. PID turn parameters are then set for
+                        the small-angle turns of the observation loop. After running the update step, we extract the
+                        estimated pose by finding the belief with the highest probability and converting to a grid
+                        location with the mapper class. PID turn parameters for large-angle turns are restored and the
+                        pose is returned in mm.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/c91726bc9f0b7e0e474a7bbdad7efccd.js"></script>
+                    <p>
+                        Given this pose, we can then calculate the target yaw. The pseuodocode for this function is
+                        shown below. The function must map the target bearing to the 0-360 degree range and positive
+                        counterclockwise convention we are using.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/b08d935f99f4a522a9d82f62742629d0.js"></script>
+                    <p>
+                        After calculating the target yaw, we can then call the <i>turn(..)</i> function and pass in the
+                        target yaw. Then, we would need to drive forward a distnace to the next waypoint. It is unclear
+                        to me how to implement this with our current drive PID controller based on target distance away
+                        from forward obstacles. We would need to find the expected TOF reading at the waypoint based on
+                        the robot's yaw. For this scenario, a PID drive controller based on distance traveled would be
+                        more
+                        appropriate. We would not need to calculate the expected TOF reading based on yaw since the
+                        distance traveled is relative to the initial TOF reading.
                     </p>
                 </div>
                 <div class="flex-grow-1">
@@ -190,6 +214,14 @@
                         drift to inaccurate values. This is likely due to the IMU's placement near the motor drivers. A
                         quick and dirty solution would be to restart the Artemis before a run. This would be a bigger
                         problem if we relied on localization.
+                    </p>
+                    <h4>Finding Suitable PID parameters</h4>
+                    <p>
+                        It is important for the first 90-degree turn to be accurate. Overshooting or undershooting would
+                        lead to the TOF sensor measuring an obstacle instead of the eastern wall. A high proportional
+                        gain would lead to oscillations. Too low of a gain would lead to undershooting the setpoint. A
+                        combination of raising the floor PWM and decreasing the proportional gain allowed us to reach
+                        the setpoint with minimal oscillations.
                     </p>
                 </div>
                 <!-- <div class="flex-grow-1">
