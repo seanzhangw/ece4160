@@ -191,6 +191,38 @@
                         appropriate. We would not need to calculate the expected TOF reading based on yaw since the
                         distance traveled is relative to the initial TOF reading.
                     </p>
+                    <p>
+                        Instead of fully calculating a new path, we can also use the localization results to make small
+                        adjustments at problematic waypoints. At the points (2, -3) and (0, 0), we can check if our
+                        x-axis belief is equivalent to 2 and 0 respectively. If not, we can drive forward a small
+                        distance to correct our x-position. The same goes for the y-axis. The Python code for these
+                        small local adjustments is shown below.
+                    </p>
+                    <script src="https://gist.github.com/seanzhangw/23895d2962b841bb4af4c97cc8a4801e.js"></script>
+                    <p>
+                        The run below shows the robot executing the pre-planned path with localization and small local
+                        adjustments. The robot is able to navigate through the environment and accurately reach all the
+                        waypoints.
+                    </p>
+
+                    <div style="text-align: center;">
+                        <iframe src="https://www.youtube.com/embed/M5YmLJpxTiw" width="560" height="315"
+                            title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write;
+                        encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        <figcaption>Figure 4: Path Execution with Localization</figcaption>
+                        </figcaption>
+                    </div>
+                    <p>
+                        The plot and the update step data outputs are shown below.
+                    </p>
+                    <div style="text-align: center;">
+                        <img src="assets/img/lab12/localization_plotter.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 5: Localization Plot</figcaption>
+                        <img src="assets/img/lab12/localization_data.png" alt="mac_address"
+                            style="max-width: 50%; height: auto;">
+                        <figcaption>Figure 6: Localization Data</figcaption>
+                    </div>
                 </div>
                 <div class="flex-grow-1">
                     <h3 class="mb-1">Challenges</h3>
@@ -201,26 +233,35 @@
                     </p>
                     <h4>Inconsistent TOF readings</h4>
                     <p>
-                        As mentioned earlier, the PID controller for driving forward's setpoint was initially base don
+                        As mentioned earlier, the PID controller for driving forward's setpoint was initially base
+                        don
                         distance traveled. This is implemented by taking an initial TOF reading then comparing
                         subsequent TOF readings to the initial reading. However, this meant the first reading was
-                        extremely important, and a grossly inaccurate reading would ruin the run. PID control based on
-                        target distance is more robust to these one-off errors since the robot continuously takes TOF
+                        extremely important, and a grossly inaccurate reading would ruin the run. PID control based
+                        on
+                        target distance is more robust to these one-off errors since the robot continuously takes
+                        TOF
                         readings and calculates a new control signal.
                     </p>
                     <h4>DMP Drift</h4>
                     <p>
                         In cases where we have the robot on for an extended period of time, the DMP readings would
-                        drift to inaccurate values. This is likely due to the IMU's placement near the motor drivers. A
-                        quick and dirty solution would be to restart the Artemis before a run. This would be a bigger
+                        drift to inaccurate values. This is likely due to the IMU's placement near the motor
+                        drivers. A
+                        quick and dirty solution would be to restart the Artemis before a run. This would be a
+                        bigger
                         problem if we relied on localization.
                     </p>
                     <h4>Finding Suitable PID parameters</h4>
                     <p>
-                        It is important for the first 90-degree turn to be accurate. Overshooting or undershooting would
-                        lead to the TOF sensor measuring an obstacle instead of the eastern wall. A high proportional
-                        gain would lead to oscillations. Too low of a gain would lead to undershooting the setpoint. A
-                        combination of raising the floor PWM and decreasing the proportional gain allowed us to reach
+                        It is important for the first 90-degree turn to be accurate. Overshooting or undershooting
+                        would
+                        lead to the TOF sensor measuring an obstacle instead of the eastern wall. A high
+                        proportional
+                        gain would lead to oscillations. Too low of a gain would lead to undershooting the setpoint.
+                        A
+                        combination of raising the floor PWM and decreasing the proportional gain allowed us to
+                        reach
                         the setpoint with minimal oscillations.
                     </p>
                 </div>
